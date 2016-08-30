@@ -1,6 +1,6 @@
 package org.robotframework.filelibrary.keyword;
 
-import org.robotframework.filelibrary.template.TemplateService;
+import org.robotframework.filelibrary.service.TemplateService;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;

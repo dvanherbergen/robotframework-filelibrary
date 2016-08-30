@@ -13,7 +13,7 @@ public class CsvUtilTest {
 	@Test
 	public void canReadCsvFile() {
 
-		List<Map<String, Object>> results = CsvUtil.loadValuesFromFile("input.csv");
+		List<Map<String, Object>> results = CsvUtil.loadValuesFromFile("src/test/resources/input.csv");
 
 		Assert.assertEquals(3, results.size());
 
@@ -36,7 +36,7 @@ public class CsvUtilTest {
 			CsvUtil.loadValuesFromFile("does_not_exist");
 			Assert.fail("Missing exception.");
 		} catch (FileLibraryException e) {
-			Assert.assertEquals("File not found", e.getMessage());
+			Assert.assertTrue(e.getMessage().startsWith("Cannot find file"));
 		}
 	}
 

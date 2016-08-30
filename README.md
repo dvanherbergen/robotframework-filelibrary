@@ -4,6 +4,8 @@ RobotFramework library for generating data files.
 
 ## TODO
 
+
+
 - queries
 	AP
 	AP-With-...
@@ -19,10 +21,10 @@ RobotFramework library for generating data files.
 
 - generate XML files
 - generate CSV files
-
+- change working directory of remote lib to test dir
 - default variables in context (time, ...)
 - extendable variable expansion
 - load datafiles into DB using DBUnit?
 - compare datafiles with custom diff ?
-- add compression
+- add compression for large datasets?
 -  

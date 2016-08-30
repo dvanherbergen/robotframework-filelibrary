@@ -1,4 +1,4 @@
-package org.robotframework.filelibrary.template;
+package org.robotframework.filelibrary.service;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,7 +42,7 @@ public class TemplateService {
 			Template template = config.getTemplate(templateFile);
 			File outFile = new File(outputFile);
 			writer = new FileWriter(outFile);
-			template.process(TemplateContext.getCurrentContext().getValues(), writer);
+			template.process(TemplateContext.getInstance().getValues(), writer);
 			System.out.println("Created '" + outFile.getAbsolutePath() + "' from template '" + template.getName() + "'");
 		} catch (IOException | TemplateException e) {
 			throw new FileLibraryException(e);

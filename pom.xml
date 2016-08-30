@@ -43,11 +43,57 @@
 									<include>org.apache.derby</include>
 									<include>com.fasterxml.jackson.core</include>
 									<include>com.fasterxml.jackson.dataformat</include>
+									<include>com.github.ombre42:jrobotremoteserver</include>
+									<include>org.apache.xmlrpc:xmlrpc-server</include>
+									<include>org.apache.xmlrpc:xmlrpc-common</include>
+									<include>org.apache.ws.commons.util:ws-commons-util</include>
+									<include>xml-apis:xml-apis</include>
+									<include>org.eclipse.jetty:jetty-servlet</include>
+									<include>org.eclipse.jetty:jetty-security</include>
+									<include>org.eclipse.jetty:jetty-server</include>
+									<include>org.eclipse.jetty:jetty-orbit</include>
+									<include>org.eclipse.jetty.orbit:javax.servlet</include>
+									<include>org.eclipse.jetty:jetty-continuation</include>
+									<include>org.eclipse.jetty:jetty-http</include>
+									<include>org.eclipse.jetty:jetty-io</include>
+									<include>org.eclipse.jetty:jetty-util</include>
+									<include>commons-lang:commons-lang</include>
+									<include>commons-logging:commons-logging</include>
+									<include>log4j:log4j</include>
 								</includes>
 							</artifactSet>
+							<filters>
+								<filter>
+									<artifact>org.eclipse.*</artifact>
+									<excludes>
+										<exclude>META-INF/**</exclude>
+										<exclude>about*</exclude>
+										<exclude>plugin*</exclude>
+									</excludes>
+								</filter>
+								<filter>
+									<artifact>org.apache*</artifact>
+									<excludes>
+										<exclude>META-INF/**</exclude>
+										<exclude>about_files</exclude>
+									</excludes>
+								</filter>
+							</filters>
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.robotframework.filelibrary.remote.RPCServer</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -84,6 +130,11 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-csv</artifactId>
 			<version>2.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ombre42</groupId>
+			<artifactId>jrobotremoteserver</artifactId>
+			<version>3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

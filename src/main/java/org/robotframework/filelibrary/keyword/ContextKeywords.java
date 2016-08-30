@@ -18,7 +18,7 @@ public class ContextKeywords {
 
 	@RobotKeyword("Clear the template context. All existing data in the context will be removed.")
 	public void resetTemplateContext() {
-		TemplateContext.getCurrentContext().reset();
+		TemplateContext.getInstance().reset();
 		System.out.println("Template Context Reset.");
 	}
 
@@ -31,7 +31,7 @@ public class ContextKeywords {
 	@RobotKeyword("Populate a variable in the template context.")
 	@ArgumentNames({ "name", "value" })
 	public void setTemplateVariable(String name, String value) {
-		TemplateContext.getCurrentContext().setValue(name, value);
+		TemplateContext.getInstance().setValue(name, value);
 	}
 
 	@RobotKeywordOverload
@@ -43,14 +43,14 @@ public class ContextKeywords {
 	@ArgumentNames("outputFilePath=")
 	public String logTemplateContext(String outputFilePath) {
 
-		String contextString = TemplateContext.getCurrentContext().toJSON();
+		String contextString = TemplateContext.getInstance().toJSON();
 		System.out.println("Template context: \n" + contextString);
 
 		if (outputFilePath != null) {
 			try {
 				File outputFile = new File(outputFilePath);
 				FileWriter writer = new FileWriter(outputFile);
-				writer.append(TemplateContext.getCurrentContext().toJSON());
+				writer.append(TemplateContext.getInstance().toJSON());
 				writer.close();
 				System.out.println("Created '" + outputFile.getAbsolutePath() + "'");
 			} catch (IOException e) {
@@ -65,7 +65,7 @@ public class ContextKeywords {
 	public void setTemplateVariableFromCSV(String variableName, String file) {
 
 		List<?> records = CsvUtil.loadValuesFromFile(file);
-		TemplateContext.getCurrentContext().setValues(variableName, records);
+		TemplateContext.getInstance().setValues(variableName, records);
 
 	}
 

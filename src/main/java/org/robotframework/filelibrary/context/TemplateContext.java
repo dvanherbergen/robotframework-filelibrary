@@ -5,19 +5,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.robotframework.filelibrary.util.JsonUtil;
 
 public class TemplateContext {
 
-	private static final ThreadLocal<TemplateContext> context = new ThreadLocal<TemplateContext>() {
-		@Override
-		protected TemplateContext initialValue() {
-			return new TemplateContext();
-		}
-	};
-
-	private Map<String, Object> values = new HashMap<String, Object>();
+	private static TemplateContext instance;
+	
+	private Map<String, Object> values = new ConcurrentHashMap<String, Object>();
 
 	public TemplateContext() {
 		initDefaultValues();
@@ -27,8 +23,15 @@ public class TemplateContext {
 		return values;
 	}
 
-	public static TemplateContext getCurrentContext() {
-		return context.get();
+	public static TemplateContext getInstance() {
+		if (instance == null) {
+			synchronized(TemplateContext.class){
+				if (instance == null) {
+					instance = new TemplateContext();
+				}
+			}
+		}
+		return instance;
 	}
 
 	public void reset() {
