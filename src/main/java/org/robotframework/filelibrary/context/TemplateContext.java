@@ -12,7 +12,7 @@ import org.robotframework.filelibrary.util.JsonUtil;
 public class TemplateContext {
 
 	private static TemplateContext instance;
-	
+
 	private Map<String, Object> values = new ConcurrentHashMap<String, Object>();
 
 	public TemplateContext() {
@@ -25,7 +25,7 @@ public class TemplateContext {
 
 	public static TemplateContext getInstance() {
 		if (instance == null) {
-			synchronized(TemplateContext.class){
+			synchronized (TemplateContext.class) {
 				if (instance == null) {
 					instance = new TemplateContext();
 				}
@@ -51,7 +51,7 @@ public class TemplateContext {
 	private void setAttributeValue(String attribute, Object value) {
 
 		if (attribute.indexOf('.') == -1) {
-			values.put(attribute, value);
+			mergeValueInMap(values, attribute, value);
 		} else {
 
 			// find correct child map where to add the value
@@ -67,9 +67,25 @@ public class TemplateContext {
 					targetMap = childMap;
 				}
 			}
-			targetMap.put(attributes[attributes.length - 1], value);
-
+			mergeValueInMap(targetMap, attributes[attributes.length - 1], value);
 		}
+	}
+
+	private void mergeValueInMap(Map targetMap, String attribute, Object value) {
+
+		if (value instanceof Map && targetMap.containsKey(attribute) && targetMap.get(attribute) instanceof Map) {
+			Map mergeFromMap = (Map) value;
+			Map mergeToMap = (Map) targetMap.get(attribute);
+			Iterator<String> it = mergeFromMap.keySet().iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				Object valueToMerge = mergeFromMap.get(key);
+				mergeToMap.put(key, valueToMerge);
+			}
+		} else {
+			targetMap.put(attribute, value);
+		}
+
 	}
 
 	public Object expandJsonValue(String value) {
@@ -95,5 +111,33 @@ public class TemplateContext {
 
 	public void setValues(String attribute, List<?> value) {
 		setAttributeValue(attribute, value);
+	}
+
+	public void setValue(String attribute, Map<String, Object> value) {
+		setAttributeValue(attribute, value);
+	}
+
+	public Object getValue(String attribute) {
+
+		if (attribute.indexOf('.') == -1) {
+			return values.get(attribute);
+		} else {
+
+			// find correct child map where to get the value from
+			String attributes[] = attribute.split("\\.");
+			Map<String, Object> sourceMap = values;
+			for (int i = 0; i < attributes.length - 1; i++) {
+				if (sourceMap.get(attributes[i]) instanceof Map) {
+					sourceMap = (Map<String, Object>) sourceMap.get(attributes[i]);
+				} else {
+					return "";
+				}
+			}
+			if (sourceMap == null) {
+				return "";
+			}
+		}
+
+		return null;
 	}
 }

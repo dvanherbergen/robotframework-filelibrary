@@ -1,14 +1,6 @@
 package org.robotframework.filelibrary.keyword;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.robotframework.filelibrary.FileLibraryException;
+import org.robotframework.filelibrary.service.DatabaseService;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywords;
@@ -16,44 +8,37 @@ import org.robotframework.javalib.annotation.RobotKeywords;
 @RobotKeywords
 public class DatabaseKeywords {
 
-	private static SqlSession session;
+	DatabaseService service = DatabaseService.getInstance();
 
-	@RobotKeyword("Connect to database specified in the given iBatis config")
-	@ArgumentNames("path")
-	public void connect(String path) {
-		try {
-			InputStream inputStream = Resources.getResourceAsStream(path);
-			SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-			session = sessionFactory.openSession();
-		} catch (Exception e) {
-			throw new FileLibraryException(e);
-		}
+	@RobotKeyword("Connect to database using the specified arguments")
+	@ArgumentNames({ "driver", "url", "user", "password" })
+	public void connect(String driver, String url, String user, String password) {
+		service.connect(driver, url, user, password);
 	}
 
-	@RobotKeyword("Execute the SQL select defined by a given _sqlId_")
-	@ArgumentNames("sqlId")
-	public Map<Object, Object> executeQuery(String id) {
-		return getSession().selectMap(id, null);
-	}
-
-	@RobotKeyword("Execute the SQL select defined by a given _sqlId_")
-	@ArgumentNames("sqlId")
-	public List<Map> executeQueryAsList(String id) {
-		return getSession().selectList(id, null);
-	}
+	// @RobotKeyword("Execute the SQL select defined by a given _sqlId_")
+	// @ArgumentNames({ "sql", "namedArgs" })
+	// public Map<String, Object> executeQuery(String sql, String...
+	// namedParameters) {
+	// return service.executeQuery(sql, namedParameters);
+	// }
+	//
+	// @RobotKeyword("Execute the SQL select defined by a given _sqlId_")
+	// @ArgumentNames({"sql", "namedArgs"})
+	// public Map<Object, Object> executeSQLFile(String filename, String...
+	// namedParameters) {
+	// return service.executeSQLFile(filename, namedParameters);
+	// }
+	//
+	// @RobotKeyword("Execute the SQL select defined by a given _sqlId_")
+	// @ArgumentNames("sqlId")
+	// public List<Map> executeQueryAsList(String id) {
+	// return getSession().selectList(id, null);
+	// }
 
 	@RobotKeyword("Close SQL session")
 	public void disconnect() {
-		if (session != null) {
-			session.close();
-			session = null;
-		}
+		service.disconnect();
 	}
 
-	private SqlSession getSession() {
-		if (session == null) {
-			throw new FileLibraryException("No Session was open. Use the 'Connect' keyword to open a session first.");
-		}
-		return session;
-	}
 }

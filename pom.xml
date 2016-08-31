@@ -39,7 +39,6 @@
 								<includes>
 									<include>org.robotframework:javalib-core</include>
 									<include>org.freemarker:freemarker</include>
-									<include>org.mybatis</include>
 									<include>org.apache.derby</include>
 									<include>com.fasterxml.jackson.core</include>
 									<include>com.fasterxml.jackson.dataformat</include>
@@ -108,18 +107,6 @@
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>2.3.25-incubating</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis</artifactId>
-			<version>3.4.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>run</artifactId>
-			<version>10.12.1.1</version>
-			<scope>system</scope>
-			<systemPath>/Users/davy/derby/lib/derbyrun.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

@@ -1,16 +1,18 @@
 package org.robotframework.filelibrary;
 
-
 import org.robotframework.javalib.library.AnnotationLibrary;
 import org.robotframework.javalib.library.KeywordDocumentationRepository;
 import org.robotframework.javalib.library.RobotJavaLibrary;
 
 public class FileLibrary implements KeywordDocumentationRepository, RobotJavaLibrary {
 
+	public static final String ROBOT_LIBRARY_SCOPE = "GLOBAL";
+
 	private static final String LIBRARY_DOCUMENTATION = "FileLibrary is a Robot Framework test library for generating test data files.\n"
 			+ "Built in variables: now";
 
-	private final AnnotationLibrary annotationLibrary = new AnnotationLibrary("org/robotframework/filelibrary/keyword/*.class");
+	private final AnnotationLibrary annotationLibrary = new AnnotationLibrary(
+			"org/robotframework/filelibrary/keyword/*.class");
 
 	@Override
 	public Object runKeyword(String keywordName, Object[] args) {
