@@ -1,15 +1,11 @@
 package org.robotframework.filelibrary.service;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,60 +81,25 @@ public class DatabaseService {
 			StatementParser parser = new StatementParser(sql);
 
 			PreparedStatement stmt = con.prepareStatement(parser.getStatement());
-			ParameterMetaData metadata = stmt.getParameterMetaData();
+
 			List<String> params = parser.getParameters();
 			int i = 1;
 			for (String param : params) {
 
-				String paramValue = TemplateContext.getInstance().getValue(param).toString();
-				switch (metadata.getParameterType(i)) {
-
-				case Types.NUMERIC:
-				case Types.DECIMAL:
-					stmt.setBigDecimal(i, new BigDecimal(paramValue));
-					break;
-				case Types.BIT:
-					stmt.setBoolean(i, Boolean.parseBoolean(paramValue));
-					break;
-				case Types.TINYINT:
-					stmt.setByte(i, Byte.valueOf(paramValue));
-					break;
-				case Types.SMALLINT:
-					stmt.setShort(i, Short.valueOf(paramValue));
-					break;
-				case Types.INTEGER:
-					stmt.setInt(i, Integer.valueOf(paramValue));
-					break;
-				case Types.BIGINT:
-					stmt.setLong(i, Long.valueOf(paramValue));
-					break;
-				case Types.REAL:
-				case Types.FLOAT:
-					stmt.setFloat(i, Float.valueOf(paramValue));
-					break;
-				case Types.DOUBLE:
-					stmt.setDouble(i, Double.valueOf(paramValue));
-					break;
-				case Types.BINARY:
-				case Types.VARBINARY:
-				case Types.LONGVARBINARY:
-					stmt.setBytes(i, paramValue.getBytes());
-				case Types.DATE:
-					stmt.setDate(i, java.sql.Date.valueOf(paramValue));
-					break;
-				case Types.TIME:
-					stmt.setTime(i, Time.valueOf(paramValue));
-					break;
-				case Types.TIMESTAMP:
-					stmt.setTimestamp(i, Timestamp.valueOf(paramValue));
-					break;
-				default:
-					stmt.setString(i, paramValue);
-					break;
+				Object v = TemplateContext.getInstance().getValue(param);
+				if (v == null) {
+					throw new FileLibraryException("No value found for parameter '" + param + "'.");
 				}
+				String paramValue = v.toString();
+				System.out.println("Setting sql param '" + param + "' to '" + paramValue + "'");
+				stmt.setString(i, paramValue);
 				i++;
 			}
+			System.out.println("Executing stmt: \n" + parser.getStatement());
+			stmt.setQueryTimeout(30);
+			long start = System.currentTimeMillis();
 			ResultSet rs = stmt.executeQuery();
+			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
 			return toMap(rs);
 		} catch (SQLException e) {
 			throw new FileLibraryException(e);

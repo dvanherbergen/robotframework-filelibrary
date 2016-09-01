@@ -10,37 +10,41 @@ public class StatementParser {
 
 	private List<String> parameters = new ArrayList<String>();
 
-	private StringBuilder statement = new StringBuilder();
+	private String statement;
 
 	public StatementParser(String text) {
-		parseText(text);
+		statement = parseText(text).trim();
+		if (statement.endsWith(";")) {
+			statement = statement.substring(0, statement.indexOf(';')).trim();
+		}
 	}
 
-	private void parseText(String text) {
+	private String parseText(String text) {
+
+		StringBuilder builder = new StringBuilder();
 
 		int startPos = text.indexOf("${");
 		if (startPos == -1) {
-			statement.append(text);
-			return;
+			return text;
 		}
 
 		int endPos = text.indexOf('}', startPos);
 		if (endPos == -1) {
-			statement.append(text);
-			return;
+			return text;
 		}
 
 		if (startPos > 0) {
-			statement.append(text.substring(0, startPos));
+			builder.append(text.substring(0, startPos));
 		}
 
 		parameters.add(text.substring(startPos + 2, endPos));
 
-		statement.append("?");
+		builder.append("?");
 		if (endPos < text.length()) {
-			parseText(text.substring(endPos + 1));
+			builder.append(parseText(text.substring(endPos + 1)));
 		}
 
+		return builder.toString();
 	}
 
 	public List<String> getParameters() {

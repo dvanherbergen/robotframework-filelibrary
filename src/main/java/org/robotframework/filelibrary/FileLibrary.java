@@ -8,7 +8,7 @@ public class FileLibrary implements KeywordDocumentationRepository, RobotJavaLib
 
 	public static final String ROBOT_LIBRARY_SCOPE = "GLOBAL";
 
-	private static final String LIBRARY_DOCUMENTATION = "FileLibrary is a Robot Framework test library for generating test data files.\n"
+	public static final String LIBRARY_DOCUMENTATION = "FileLibrary is a Robot Framework test library for generating test data files.\n"
 			+ "Built in variables: now";
 
 	private final AnnotationLibrary annotationLibrary = new AnnotationLibrary(

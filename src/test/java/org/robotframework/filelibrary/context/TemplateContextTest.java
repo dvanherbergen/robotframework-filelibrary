@@ -50,8 +50,9 @@ public class TemplateContextTest {
 
 	@Test
 	public void canSetVariableWithJSONData() {
-		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n" + "    \"street\" : \"High Street\",\n"
-				+ "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n" + "  }\n" + "}";
+		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n"
+				+ "    \"street\" : \"High Street\",\n" + "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n"
+				+ "  }\n" + "}";
 		TemplateContext context = new TemplateContext();
 		context.setValue("user", json);
 
@@ -65,8 +66,9 @@ public class TemplateContextTest {
 
 	@Test
 	public void canInitializeVariablesFromJSON() {
-		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n" + "    \"street\" : \"High Street\",\n"
-				+ "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n" + "  }\n" + "}";
+		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n"
+				+ "    \"street\" : \"High Street\",\n" + "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n"
+				+ "  }\n" + "}";
 		TemplateContext context = new TemplateContext();
 		context.setValuesFromJSON(json);
 
@@ -97,5 +99,23 @@ public class TemplateContextTest {
 		Map<String, String> user2 = (Map<String, String>) ((List) context.getValues().get("users")).get(1);
 		Assert.assertEquals("1", user1.get("id"));
 		Assert.assertEquals("2", user2.get("id"));
+	}
+
+	@Test
+	public void canGetValue() {
+
+		String json = "{\n" + "  \"criteria\" : {\n" + "    \"access_point\" : \"541454823041091814\",\n"
+				+ "    \"al_account_id\" : \"43940250\",\n" + "    \"al_acct_location_id\" : \"360467025\"\n" + "  },\n"
+				+ "  \"now\" : 1472724173166,\n" + "  \"name\" : \"My First Test\"\n" + "}";
+		TemplateContext context = new TemplateContext();
+		context.setValuesFromJSON(json);
+
+		Assert.assertEquals("541454823041091814", context.getValue("criteria.access_point"));
+		Assert.assertEquals("43940250", context.getValue("criteria.al_account_id"));
+		Assert.assertEquals("My First Test", context.getValue("name"));
+		Assert.assertEquals("", context.getValue("criteria.ghost"));
+		Assert.assertEquals("", context.getValue("criteria.access_point.ghost"));
+		Assert.assertEquals("", context.getValue("ghost.value"));
+
 	}
 }

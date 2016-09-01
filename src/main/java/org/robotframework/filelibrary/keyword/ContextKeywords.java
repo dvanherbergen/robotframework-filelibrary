@@ -93,7 +93,7 @@ public class ContextKeywords {
 	public void setTemplateVariableListFromSQL(String variableName, String sql) {
 
 		List<?> records = DatabaseService.getInstance().executeQuery(sql);
-		System.out.println("Query returned " + records.size() + " results.");
+		System.out.println("Query returned " + records.size() + " results.\n");
 		TemplateContext.getInstance().setValues(variableName, records);
 
 	}

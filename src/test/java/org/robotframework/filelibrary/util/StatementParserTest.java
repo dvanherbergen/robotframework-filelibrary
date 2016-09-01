@@ -23,4 +23,10 @@ public class StatementParserTest {
 		StatementParser util = new StatementParser("${color} is the ${level} color of ${scope}");
 		Assert.assertEquals("? is the ? color of ?", util.getStatement());
 	}
+
+	@Test
+	public void canTrimSemicolon() {
+		StatementParser util = new StatementParser("${color} is the ${level} color of ${scope} ; ");
+		Assert.assertEquals("? is the ? color of ?", util.getStatement());
+	}
 }

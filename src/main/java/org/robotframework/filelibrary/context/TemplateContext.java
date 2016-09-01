@@ -119,25 +119,28 @@ public class TemplateContext {
 
 	public Object getValue(String attribute) {
 
+		Object value = null;
+
 		if (attribute.indexOf('.') == -1) {
-			return values.get(attribute);
+			value = values.get(attribute);
 		} else {
 
 			// find correct child map where to get the value from
 			String attributes[] = attribute.split("\\.");
 			Map<String, Object> sourceMap = values;
 			for (int i = 0; i < attributes.length - 1; i++) {
-				if (sourceMap.get(attributes[i]) instanceof Map) {
-					sourceMap = (Map<String, Object>) sourceMap.get(attributes[i]);
-				} else {
+				if (!(sourceMap.get(attributes[i]) instanceof Map)) {
 					return "";
 				}
+				sourceMap = (Map<String, Object>) sourceMap.get(attributes[i]);
 			}
-			if (sourceMap == null) {
-				return "";
-			}
+
+			value = sourceMap.get(attributes[attributes.length - 1]);
 		}
 
-		return null;
+		if (value == null) {
+			value = "";
+		}
+		return value;
 	}
 }

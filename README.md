@@ -4,7 +4,7 @@ RobotFramework library for generating data files.
 
 ## TODO
 
-
+- loop over data list and inject further query results
 
 - queries
 	AP
