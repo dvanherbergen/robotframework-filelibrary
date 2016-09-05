@@ -34,6 +34,16 @@ public class ContextKeywords {
 		resetTemplateContext(null);
 	}
 
+	@RobotKeyword("Get a specific value from the template context")
+	@ArgumentNames("attribute")
+	public String getTemplateVariable(String attributeName) {
+		Object value = TemplateContext.getInstance().getValue(attributeName);
+		if (value != null) {
+			return value.toString();
+		}
+		return "";
+	}
+
 	@RobotKeyword("Populate variables in the template context.")
 	@ArgumentNames("props")
 	public void setTemplateContext(Object props) {

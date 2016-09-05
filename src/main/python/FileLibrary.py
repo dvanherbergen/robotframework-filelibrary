@@ -45,4 +45,4 @@ class FileLibrary:
 			else:
 				self.remoteLib.run_keyword(name, (), kwargs)			
 		else:
-			self.remoteLib.run_keyword(name, arguments, kwargs)
+			return self.remoteLib.run_keyword(name, arguments, kwargs)
