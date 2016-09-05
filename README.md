@@ -1,5 +1,9 @@
-# robotframework-datalibrary
+# robotframework-filelibrary
 RobotFramework library for generating data files.
+
+
+## Usage
+- add jdbc driver jar + filelibrary jar to PYTHONPATH env
 
 
 ## TODO

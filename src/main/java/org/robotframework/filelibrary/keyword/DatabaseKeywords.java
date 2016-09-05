@@ -1,5 +1,7 @@
 package org.robotframework.filelibrary.keyword;
 
+import org.robotframework.filelibrary.FileLibraryException;
+import org.robotframework.filelibrary.remote.RPCServer;
 import org.robotframework.filelibrary.service.DatabaseService;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.RobotKeyword;
@@ -14,6 +16,12 @@ public class DatabaseKeywords {
 	@ArgumentNames({ "driver", "url", "user", "password" })
 	public void connect(String driver, String url, String user, String password) {
 		service.connect(driver, url, user, password);
+	}
+
+	@RobotKeyword("Set default query timeout.")
+	@ArgumentNames({ "seconds" })
+	public void setQueryTimeOut(int timeout) {
+		service.setQueryTimeOut(timeout);
 	}
 
 	// @RobotKeyword("Execute the SQL select defined by a given _sqlId_")
@@ -39,6 +47,16 @@ public class DatabaseKeywords {
 	@RobotKeyword("Close SQL session")
 	public void disconnect() {
 		service.disconnect();
+	}
+
+	@RobotKeyword("Stop remote library.")
+	public void stopFileLibraryProcess() {
+		service.disconnect();
+		try {
+			RPCServer.getInstance().stop();
+		} catch (Exception e) {
+			throw new FileLibraryException(e);
+		}
 	}
 
 }

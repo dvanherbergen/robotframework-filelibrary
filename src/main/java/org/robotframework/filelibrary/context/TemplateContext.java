@@ -105,7 +105,10 @@ public class TemplateContext {
 		Iterator<String> it = valueMap.keySet().iterator();
 		while (it.hasNext()) {
 			String key = it.next();
-			values.put(key, valueMap.get(key));
+			Object content = valueMap.get(key);
+			if (content != null) {
+				values.put(key, content);
+			}
 		}
 	}
 

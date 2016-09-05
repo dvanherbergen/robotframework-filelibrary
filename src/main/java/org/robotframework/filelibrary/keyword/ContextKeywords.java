@@ -19,10 +19,19 @@ import org.robotframework.javalib.annotation.RobotKeywords;
 @RobotKeywords
 public class ContextKeywords {
 
-	@RobotKeyword("Clear the template context. All existing data in the context will be removed.")
-	public void resetTemplateContext() {
+	@RobotKeyword("Clear the template context. All existing data in the context will be removed. When the optional argument True is given; the context will be preloaded with test variables.")
+	@ArgumentNames("initialize=")
+	public void resetTemplateContext(String variables) {
 		TemplateContext.getInstance().reset();
+		if (variables != null) {
+			TemplateContext.getInstance().setValuesFromJSON(variables);
+		}
 		System.out.println("Template Context Reset.");
+	}
+
+	@RobotKeywordOverload
+	public void resetTemplateContext() {
+		resetTemplateContext(null);
 	}
 
 	@RobotKeyword("Populate variables in the template context.")
@@ -76,15 +85,11 @@ public class ContextKeywords {
 	@ArgumentNames({ "variableName", "sql" })
 	public void setTemplateVariableFromSQL(String variableName, String sql) {
 
-		List<Map<String, Object>> records = DatabaseService.getInstance().executeQuery(sql);
+		List<Map<String, Object>> records = DatabaseService.getInstance().executeQuery(sql, 1);
 		if (records.isEmpty()) {
 			throw new FileLibraryException("SQL returned no results.");
 		}
-		System.out.println("Query returned " + records.size() + " results.");
-		if (records.size() > 1) {
-			System.out.println(
-					"Only using first record. Use set template variable list from sql instead to use all records.");
-		}
+		System.out.println("Query returned " + records.size() + " result.");
 		TemplateContext.getInstance().setValue(variableName, records.get(0));
 	}
 

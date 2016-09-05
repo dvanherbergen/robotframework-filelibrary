@@ -23,6 +23,8 @@ public class DatabaseService {
 
 	private static DatabaseService instance;
 
+	private int queryTimeOut = 30;
+
 	private DatabaseService() {
 
 	}
@@ -55,7 +57,7 @@ public class DatabaseService {
 				con = DriverManager.getConnection(url, user, password);
 			}
 			if (con.isValid(1)) {
-				System.out.println("Connected to database.");
+				System.out.println("Connected to database " + url);
 			}
 		} catch (Exception e) {
 			throw new FileLibraryException(e);
@@ -75,6 +77,10 @@ public class DatabaseService {
 	}
 
 	public List<Map<String, Object>> executeQuery(String sql) {
+		return executeQuery(sql, 0);
+	}
+
+	public List<Map<String, Object>> executeQuery(String sql, int maxResults) {
 		try {
 			Connection con = getConnection();
 
@@ -96,9 +102,10 @@ public class DatabaseService {
 				i++;
 			}
 			System.out.println("Executing stmt: \n" + parser.getStatement());
-			stmt.setQueryTimeout(30);
+			stmt.setQueryTimeout(queryTimeOut);
 			long start = System.currentTimeMillis();
 			ResultSet rs = stmt.executeQuery();
+			stmt.setMaxRows(maxResults);
 			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
 			return toMap(rs);
 		} catch (SQLException e) {
@@ -158,4 +165,10 @@ public class DatabaseService {
 
 		return results;
 	}
+
+	public void setQueryTimeOut(int timeOut) {
+		this.queryTimeOut = timeOut;
+		System.out.println("Query timeout set to " + timeOut + " seconds.");
+	}
+
 }
