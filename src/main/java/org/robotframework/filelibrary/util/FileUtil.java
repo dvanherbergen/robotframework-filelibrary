@@ -5,10 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.robotframework.filelibrary.FileLibraryException;
 
 public class FileUtil {
+
+	private static final Pattern sqlFilenamePattern = Pattern.compile(".*\\.sql");
 
 	public static List<String> parseSQLStatements(String filename) {
 
@@ -59,6 +62,10 @@ public class FileUtil {
 		}
 
 		return statements;
+	}
+
+	public static boolean isSqlFileName(String value) {
+		return value != null && sqlFilenamePattern.matcher(value.trim().toLowerCase()).matches();
 	}
 
 }

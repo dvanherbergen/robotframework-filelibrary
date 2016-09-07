@@ -8,11 +8,12 @@ RobotFramework library for generating data files.
 
 ## TODO
 
-- get template variable
+- get template variable list?
 - loop over data list and inject further query results
 - verify query result
 - compare files
-
+- zip
+- today
 
 - queries
 	AP

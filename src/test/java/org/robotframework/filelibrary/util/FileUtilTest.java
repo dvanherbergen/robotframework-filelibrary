@@ -34,4 +34,16 @@ public class FileUtilTest {
 	public void failsOnMissingFile() {
 		FileUtil.parseSQLStatements("src/test/resources/FileUtil/dummy.sql");
 	}
+
+	@Test
+	public void canDetectSqlFilenam() {
+		Assert.assertEquals(true, FileUtil.isSqlFileName("c:\\test\\resource\\myfile.sql"));
+		Assert.assertEquals(true, FileUtil.isSqlFileName("c:\\test\\resource\\myfile.SQL  "));
+		Assert.assertEquals(false, FileUtil.isSqlFileName("c:\\test\\resource\\myfile.csv"));
+		Assert.assertEquals(false, FileUtil.isSqlFileName(""));
+		Assert.assertEquals(false, FileUtil.isSqlFileName(null));
+		Assert.assertEquals(false, FileUtil.isSqlFileName(""));
+		Assert.assertEquals(false, FileUtil.isSqlFileName("select * from table"));
+
+	}
 }

@@ -38,7 +38,7 @@ class FileLibrary:
 	def run_keyword(self, name, arguments, kwargs):
 		if self.remoteLib == None:
 			self._initialize_remote_library()
-		if name == 'resetTemplateContext':
+		if name == 'resetTemplateData':
 			if (len(arguments) > 0 and arguments[0].lower() == 'true'):
 				# inject all variables from the test case context
 				self.remoteLib.run_keyword(name, (self.get_robot_variables(),), kwargs)	

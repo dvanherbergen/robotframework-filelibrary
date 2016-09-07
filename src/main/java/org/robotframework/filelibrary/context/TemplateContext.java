@@ -1,5 +1,6 @@
 package org.robotframework.filelibrary.context;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +41,8 @@ public class TemplateContext {
 	}
 
 	private void initDefaultValues() {
-		values.put("now", new Date());
+		values.put("now", new SimpleDateFormat("DD/MM/YYYY HH:mm:ss").format(new Date()));
+		values.put("today", new SimpleDateFormat("DD/MM/YYYY").format(new Date()));
 	}
 
 	public void setValue(String attribute, String value) {
@@ -49,6 +51,8 @@ public class TemplateContext {
 
 	@SuppressWarnings("unchecked")
 	private void setAttributeValue(String attribute, Object value) {
+
+		attribute = cleanAttributePath(attribute);
 
 		if (attribute.indexOf('.') == -1) {
 			mergeValueInMap(values, attribute, value);
@@ -112,7 +116,7 @@ public class TemplateContext {
 		}
 	}
 
-	public void setValues(String attribute, List<?> value) {
+	public void setValueList(String attribute, List<?> value) {
 		setAttributeValue(attribute, value);
 	}
 
@@ -145,5 +149,13 @@ public class TemplateContext {
 			value = "";
 		}
 		return value;
+	}
+
+	public static boolean isListTarget(String attributePath) {
+		return attributePath.endsWith("[]");
+	}
+
+	private String cleanAttributePath(String path) {
+		return path.replaceAll("\\[\\]", "");
 	}
 }

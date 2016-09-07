@@ -3,6 +3,7 @@ package org.robotframework.filelibrary.keyword;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +20,9 @@ import org.robotframework.javalib.annotation.RobotKeywords;
 @RobotKeywords
 public class ContextKeywords {
 
-	@RobotKeyword("Clear the template context. All existing data in the context will be removed. When the optional argument True is given; the context will be preloaded with test variables.")
+	@RobotKeyword("Clear the template data. All existing data. When the optional argument True is given; the cleared template data will be preloaded with test variables.")
 	@ArgumentNames("initialize=")
-	public void resetTemplateContext(String variables) {
+	public void resetTemplateData(String variables) {
 		TemplateContext.getInstance().reset();
 		if (variables != null) {
 			TemplateContext.getInstance().setValuesFromJSON(variables);
@@ -30,13 +31,13 @@ public class ContextKeywords {
 	}
 
 	@RobotKeywordOverload
-	public void resetTemplateContext() {
-		resetTemplateContext(null);
+	public void resetTemplateData() {
+		resetTemplateData(null);
 	}
 
-	@RobotKeyword("Get a specific value from the template context")
+	@RobotKeyword("Get a specific value from the template data context.")
 	@ArgumentNames("attribute")
-	public String getTemplateVariable(String attributeName) {
+	public String getTemplateData(String attributeName) {
 		Object value = TemplateContext.getInstance().getValue(attributeName);
 		if (value != null) {
 			return value.toString();
@@ -44,26 +45,20 @@ public class ContextKeywords {
 		return "";
 	}
 
-	@RobotKeyword("Populate variables in the template context.")
-	@ArgumentNames("props")
-	public void setTemplateContext(Object props) {
-		System.out.println("Received " + props);
-	}
-
-	@RobotKeyword("Populate a variable in the template context.")
-	@ArgumentNames({ "name", "value" })
-	public void setTemplateVariable(String name, String value) {
+	@RobotKeyword("Set a variable in the template context.")
+	@ArgumentNames({ "attribute", "value" })
+	public void setTemplateData(String name, String value) {
 		TemplateContext.getInstance().setValue(name, value);
 	}
 
 	@RobotKeywordOverload
-	public String logTemplateContext() {
-		return logTemplateContext(null);
+	public String logTemplateData() {
+		return logTemplateData(null);
 	}
 
-	@RobotKeyword("Print all content of the template context as JSON. When an optional file name argument is supplied, the template context is saved as a JSON File.")
+	@RobotKeyword("Print all content of the template data as JSON. When an optional file name argument is supplied, the template context is saved as a JSON File.")
 	@ArgumentNames("outputFilePath=")
-	public String logTemplateContext(String outputFilePath) {
+	public String logTemplateData(String outputFilePath) {
 
 		String contextString = TemplateContext.getInstance().toJSON();
 		System.out.println("Template context: \n" + contextString);
@@ -82,57 +77,67 @@ public class ContextKeywords {
 		return contextString;
 	}
 
-	@RobotKeyword("Load variables from CSV.")
-	@ArgumentNames({ "variableName", "csvFilePath" })
-	public void setTemplateVariableFromCSV(String variableName, String file) {
+	@RobotKeyword("Load template data from CSV.")
+	@ArgumentNames({ "attribute", "csvFilePath" })
+	public void setTemplateDataFromCSV(String variableName, String file) {
 
 		List<?> records = CsvUtil.loadValuesFromFile(file);
-		TemplateContext.getInstance().setValues(variableName, records);
-
+		TemplateContext.getInstance().setValueList(variableName, records);
 	}
 
-	@RobotKeyword("Load variables from SQL. Only the first record is used.")
-	@ArgumentNames({ "variableName", "sql" })
-	public void setTemplateVariableFromSQL(String variableName, String sql) {
+	@RobotKeyword("Load template data from SQL. Specify either an SQL to execute or the path to a .sql file.")
+	@ArgumentNames({ "attribute", "sql" })
+	public void setTemplateDataFromSQL(String attributePath, String sql) {
 
-		List<Map<String, Object>> records = DatabaseService.getInstance().executeQuery(sql, 1);
-		if (records.isEmpty()) {
-			throw new FileLibraryException("SQL returned no results.");
+		List<String> sqls = new ArrayList<>();
+		if (FileUtil.isSqlFileName(sql)) {
+			sqls = FileUtil.parseSQLStatements(sql);
+		} else {
+			sqls.add(sql);
 		}
-		System.out.println("Query returned " + records.size() + " result.");
-		TemplateContext.getInstance().setValue(variableName, records.get(0));
-	}
 
-	@RobotKeyword("Load variable list from SQL results.")
-	@ArgumentNames({ "variableName", "sql" })
-	public void setTemplateVariableListFromSQL(String variableName, String sql) {
+		for (String stmt : sqls) {
 
-		List<?> records = DatabaseService.getInstance().executeQuery(sql);
-		System.out.println("Query returned " + records.size() + " results.\n");
-		TemplateContext.getInstance().setValues(variableName, records);
+			int resultLimit = 0;
+			if (!TemplateContext.isListTarget(attributePath)) {
+				resultLimit = 1;
+			}
 
-	}
+			List<Map<String, Object>> records = DatabaseService.getInstance().executeQuery(stmt, resultLimit);
 
-	@RobotKeyword("Load variable list from SQL results.")
-	@ArgumentNames({ "variableName", "sql" })
-	public void setTemplateVariableListFromSQLFile(String variableName, String filename) {
-
-		List<String> sqls = FileUtil.parseSQLStatements(filename);
-		if (sqls.size() != 1) {
-			throw new FileLibraryException(
-					"The sql file may only contain a single sql statement that returns multiple records. Currently the file contains "
-							+ sqls.size() + " statements");
+			System.out.println("Query returned " + records.size() + " result.");
+			if (!records.isEmpty()) {
+				if (resultLimit == 1) {
+					TemplateContext.getInstance().setValue(attributePath, records.get(0));
+				} else {
+					TemplateContext.getInstance().setValueList(attributePath, records);
+				}
+			}
 		}
-		setTemplateVariableListFromSQL(variableName, sqls.get(0));
 	}
 
-	@RobotKeyword("Load variable list from SQL results.")
-	@ArgumentNames({ "variableName", "sql" })
-	public void setTemplateVariableFromSQLFile(String variableName, String filename) {
+	@RobotKeyword("Load template data from SQL. Specify either an SQL to execute or the path to a .sql file.")
+	@ArgumentNames({ "attribute", "sql" })
+	public void addTemplateDataFromSQL(String variableName, String sql) {
 
-		List<String> sqls = FileUtil.parseSQLStatements(filename);
-		for (String sql : sqls) {
-			setTemplateVariableFromSQL(variableName, sql);
+		if (variableName.indexOf("[]") != -1) {
+			// TODO iterator over list, execute query for each entry
+
+		}
+
+		List<String> sqls = new ArrayList<>();
+		if (FileUtil.isSqlFileName(sql)) {
+			sqls = FileUtil.parseSQLStatements(sql);
+		} else {
+			sqls.add(sql);
+		}
+
+		for (String stmt : sqls) {
+			List<Map<String, Object>> records = DatabaseService.getInstance().executeQuery(stmt, 1);
+			System.out.println("Query returned " + records.size() + " result.");
+			if (!records.isEmpty()) {
+				TemplateContext.getInstance().setValue(variableName, records.get(0));
+			}
 		}
 	}
 }

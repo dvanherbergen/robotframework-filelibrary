@@ -93,7 +93,7 @@ public class TemplateContextTest {
 		map2.put("id", "2");
 
 		TemplateContext context = new TemplateContext();
-		context.setValues("users", list);
+		context.setValueList("users", list);
 
 		Map<String, String> user1 = (Map<String, String>) ((List) context.getValues().get("users")).get(0);
 		Map<String, String> user2 = (Map<String, String>) ((List) context.getValues().get("users")).get(1);
