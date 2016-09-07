@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.filelibrary.FileLibraryException;
+import org.robotframework.filelibrary.context.TemplateContext;
 import org.robotframework.filelibrary.remote.RPCServer;
 import org.robotframework.filelibrary.service.DatabaseService;
 import org.robotframework.filelibrary.util.FileUtil;
@@ -52,14 +53,16 @@ public class DatabaseKeywords {
 			StatementParser parser = new StatementParser(rawSql);
 			// TODO
 			// service.executeStmt(parser.getStatement());
+			throw new FileLibraryException("Not implemented");
 		}
 	}
 
-	@RobotKeyword("Execute a SQL statement(s) and verify that returned values match the expected values.")
-	@ArgumentNames({ "sql", "values*" })
+	@RobotKeyword("Execute a SQL statement or .sql file and verify that returned values match the expected values.")
+	@ArgumentNames({ "sql", "*values" })
 	public void verifySQLResult(String sql, String... expectedValues) {
 
-		// TODO
+		StatementParser parser = new StatementParser(sql);
+		service.verifyQueryResults(parser.getStatement(), TemplateContext.getInstance().resolveAttributes(parser.getParameters()), expectedValues);
 	}
 
 	@RobotKeyword("Close SQL session")

@@ -158,4 +158,17 @@ public class TemplateContext {
 	private String cleanAttributePath(String path) {
 		return path.replaceAll("\\[\\]", "");
 	}
+
+	public String[] resolveAttributes(String... attributePaths) {
+
+		String[] results = new String[attributePaths.length];
+		for (int i = 0; i < attributePaths.length; i++) {
+			Object value = getValue(attributePaths[i]);
+			if (value instanceof String) {
+				results[i] = (String) value;
+			}
+		}
+
+		return results;
+	}
 }

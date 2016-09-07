@@ -10,17 +10,16 @@ RobotFramework library for generating data files.
 
 - get template variable list?
 - loop over data list and inject further query results
-- verify query result
-- compare files
-- zip
-- today
-
+- bulk inserts
+- procedure calls
+- retrieve data into var (not only
+- use maven generation of doc
 - queries
 	AP
 	AP-With-...
 	AP-With-...
 
-
+- support null parameter in where clause
 
 - Configurable data source:
 	SQL
@@ -28,10 +27,6 @@ RobotFramework library for generating data files.
 	JSON?
 	XLS
 
-- generate XML files
-- generate CSV files
-- change working directory of remote lib to test dir
-- default variables in context (time, ...)
 - extendable variable expansion
 - load datafiles into DB using DBUnit?
 - compare datafiles with custom diff ?

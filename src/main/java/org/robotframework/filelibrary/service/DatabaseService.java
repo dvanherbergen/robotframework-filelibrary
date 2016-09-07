@@ -16,6 +16,7 @@ import java.util.Map;
 import org.robotframework.filelibrary.FileLibraryException;
 import org.robotframework.filelibrary.context.TemplateContext;
 import org.robotframework.filelibrary.util.StatementParser;
+import org.robotframework.filelibrary.util.TextUtil;
 
 public class DatabaseService {
 
@@ -88,9 +89,8 @@ public class DatabaseService {
 
 			PreparedStatement stmt = con.prepareStatement(parser.getStatement());
 
-			List<String> params = parser.getParameters();
 			int i = 1;
-			for (String param : params) {
+			for (String param : parser.getParameters()) {
 
 				Object v = TemplateContext.getInstance().getValue(param);
 				if (v == null) {
@@ -103,9 +103,9 @@ public class DatabaseService {
 			}
 			System.out.println("Executing stmt: \n" + parser.getStatement());
 			stmt.setQueryTimeout(queryTimeOut);
+			stmt.setMaxRows(maxResults);
 			long start = System.currentTimeMillis();
 			ResultSet rs = stmt.executeQuery();
-			stmt.setMaxRows(maxResults);
 			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
 			return toMap(rs);
 		} catch (SQLException e) {
@@ -169,6 +169,47 @@ public class DatabaseService {
 	public void setQueryTimeOut(int timeOut) {
 		this.queryTimeOut = timeOut;
 		System.out.println("Query timeout set to " + timeOut + " seconds.");
+	}
+
+	public void verifyQueryResults(String statement, String[] parameters, String[] expectedResults) {
+
+		try {
+			Connection con = getConnection();
+			PreparedStatement stmt = con.prepareStatement(statement);
+
+			int i = 1;
+			for (String paramValue : parameters) {
+				System.out.println("Setting sql param '" + i + "' to '" + paramValue + "'");
+				stmt.setString(i, paramValue);
+				i++;
+			}
+			System.out.println("Executing stmt: \n" + statement);
+			stmt.setQueryTimeout(queryTimeOut);
+			stmt.setMaxRows(1);
+			long start = System.currentTimeMillis();
+			ResultSet rs = stmt.executeQuery();
+			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
+
+			if (rs.getMetaData().getColumnCount() < expectedResults.length) {
+				throw new FileLibraryException(
+						"Expected " + expectedResults.length + "values, but only received " + rs.getMetaData().getColumnCount());
+			}
+
+			rs.next();
+			for (i = 0; i < expectedResults.length; i++) {
+				String expected = expectedResults[i];
+				String actual = rs.getString(i + 1);
+				if (!TextUtil.matches(actual, expected)) {
+					throw new FileLibraryException("Expected '" + expected + "' but received '" + actual + "'.");
+				} else {
+					System.out.println("Expected '" + expected + "' and received '" + actual + "'.");
+				}
+			}
+
+		} catch (SQLException e) {
+			throw new FileLibraryException(e);
+		}
+
 	}
 
 }

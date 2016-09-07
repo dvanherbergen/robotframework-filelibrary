@@ -47,8 +47,8 @@ public class StatementParser {
 		return builder.toString();
 	}
 
-	public List<String> getParameters() {
-		return parameters;
+	public String[] getParameters() {
+		return parameters.toArray(new String[] {});
 	}
 
 	public String getStatement() {
