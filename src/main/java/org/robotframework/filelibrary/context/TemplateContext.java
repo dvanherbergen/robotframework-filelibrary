@@ -41,8 +41,8 @@ public class TemplateContext {
 	}
 
 	private void initDefaultValues() {
-		values.put("now", new SimpleDateFormat("DD/MM/YYYY HH:mm:ss").format(new Date()));
-		values.put("today", new SimpleDateFormat("DD/MM/YYYY").format(new Date()));
+		values.put("now", new SimpleDateFormat("dd/MM/YYYY HH:mm:ss").format(new Date()));
+		values.put("today", new SimpleDateFormat("dd/MM/YYYY").format(new Date()));
 	}
 
 	public void setValue(String attribute, String value) {

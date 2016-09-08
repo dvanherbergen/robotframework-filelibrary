@@ -94,12 +94,13 @@
 					</archive>
 				</configuration>
 			</plugin>
-					<plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1.1</version>
 				<executions>
 					<execution>
+						<id>keygen</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>java</goal>
@@ -111,6 +112,38 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<execution>
+						<id>xml-doc</id>
+						<phase>install</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>python</executable>
+							<arguments>
+								<argument>-m</argument>
+								<argument>robot.libdoc</argument>
+								<argument>FileLibrary</argument>
+								<argument>${project.basedir}/doc/filelibrary.xml</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>html-doc</id>
+						<phase>install</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>python</executable>
+							<arguments>
+								<argument>-m</argument>
+								<argument>robot.libdoc</argument>
+								<argument>FileLibrary</argument>
+								<argument>${project.basedir}/doc/filelibrary.html</argument>
+							</arguments>
+						</configuration>
+					</execution>					
 				</executions>
 			</plugin>
 		</plugins>

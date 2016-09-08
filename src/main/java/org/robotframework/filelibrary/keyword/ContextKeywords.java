@@ -56,8 +56,8 @@ public class ContextKeywords {
 		return logTemplateData(null);
 	}
 
-	@RobotKeyword("Print all content of the template data as JSON. When an optional file name argument is supplied, the template context is saved as a JSON File.")
-	@ArgumentNames("outputFilePath=")
+	@RobotKeyword("Print all content of the template data as JSON. When an optional file name argument is supplied, the template context is also saved as a JSON File.")
+	@ArgumentNames("outputFile=")
 	public String logTemplateData(String outputFilePath) {
 
 		String contextString = TemplateContext.getInstance().toJSON();

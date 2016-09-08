@@ -6,9 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,21 +138,7 @@ public class DatabaseService {
 
 				Object value = null;
 
-				switch (types[i]) {
-				// TODO add more native types
-				case Types.DATE:
-				case Types.TIME:
-				case Types.TIMESTAMP:
-					value = new Date(rs.getTimestamp(i + 1).getTime());
-					break;
-				case Types.INTEGER:
-					value = Integer.valueOf(rs.getInt(i + 1));
-					break;
-
-				default:
-					value = rs.getString(i + 1);
-				}
-
+				value = rs.getString(i + 1);
 				if (value == null) {
 					value = "";
 				}
@@ -171,11 +155,13 @@ public class DatabaseService {
 		System.out.println("Query timeout set to " + timeOut + " seconds.");
 	}
 
-	public void verifyQueryResults(String statement, String[] parameters, String[] expectedResults) {
+	public void executeStatement(String statement, String[] parameters) {
 
 		try {
 			Connection con = getConnection();
 			PreparedStatement stmt = con.prepareStatement(statement);
+
+			System.out.println("Executing stmt: \n" + statement);
 
 			int i = 1;
 			for (String paramValue : parameters) {
@@ -183,7 +169,33 @@ public class DatabaseService {
 				stmt.setString(i, paramValue);
 				i++;
 			}
+
+			stmt.setQueryTimeout(queryTimeOut);
+
+			long start = System.currentTimeMillis();
+			stmt.execute();
+			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute sql.");
+
+		} catch (SQLException e) {
+			throw new FileLibraryException(e);
+		}
+
+	}
+
+	public void verifyQueryResults(String statement, String[] parameters, String[] expectedResults) {
+
+		try {
+			Connection con = getConnection();
+			PreparedStatement stmt = con.prepareStatement(statement);
+
 			System.out.println("Executing stmt: \n" + statement);
+
+			int i = 1;
+			for (String paramValue : parameters) {
+				System.out.println("Setting sql param '" + i + "' to '" + paramValue + "'");
+				stmt.setString(i, paramValue);
+				i++;
+			}
 			stmt.setQueryTimeout(queryTimeOut);
 			stmt.setMaxRows(1);
 			long start = System.currentTimeMillis();

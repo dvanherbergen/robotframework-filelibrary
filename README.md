@@ -13,22 +13,17 @@ RobotFramework library for generating data files.
 - bulk inserts
 - procedure calls
 - retrieve data into var (not only
-- use maven generation of doc
 - queries
 	AP
 	AP-With-...
 	AP-With-...
-
 - support null parameter in where clause
-
 - Configurable data source:
 	SQL
 	REST?
 	JSON?
 	XLS
 
-- extendable variable expansion
-- load datafiles into DB using DBUnit?
-- compare datafiles with custom diff ?
-- add compression for large datasets?
--  
+? load datafiles into DB using DBUnit
+? compare datafiles with custom diff
+? add compression for large datasets?

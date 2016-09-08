@@ -38,7 +38,7 @@ public class DatabaseKeywords {
 	// }
 	//
 
-	@RobotKeyword("Execute SQL statement(s). Specify either an SQL to execute or the path to a .sql file.")
+	@RobotKeyword("Execute SQL INSERT or UPDATE statement(s). Specify either an SQL directly or the path to a .sql file.")
 	@ArgumentNames({ "sql" })
 	public void executeSQL(String sql) {
 
@@ -51,9 +51,7 @@ public class DatabaseKeywords {
 
 		for (String rawSql : sqls) {
 			StatementParser parser = new StatementParser(rawSql);
-			// TODO
-			// service.executeStmt(parser.getStatement());
-			throw new FileLibraryException("Not implemented");
+			service.executeStatement(parser.getStatement(), TemplateContext.getInstance().resolveAttributes(parser.getParameters()));
 		}
 	}
 
@@ -72,6 +70,7 @@ public class DatabaseKeywords {
 
 	@RobotKeyword("Stop remote library.")
 	public void stopFileLibraryProcess() {
+
 		service.disconnect();
 		try {
 			RPCServer.getInstance().stop();
