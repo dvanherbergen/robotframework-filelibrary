@@ -1,6 +1,7 @@
 package org.robotframework.filelibrary.context;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.robotframework.filelibrary.util.JsonUtil;
+import org.robotframework.filelibrary.util.TextUtil;
 
 public class TemplateContext {
 
@@ -55,7 +57,16 @@ public class TemplateContext {
 		attribute = cleanAttributePath(attribute);
 
 		if (attribute.indexOf('.') == -1) {
-			mergeValueInMap(values, attribute, value);
+
+			if (TextUtil.containsIndex(attribute)) {
+				// TODO make more robust
+				int index = TextUtil.getIndex(attribute);
+				List<Map<String, Object>> list = (List<Map<String, Object>>) values.get(TextUtil.removeIndex(attribute));
+				mergeValueInMap(list.get(index), attribute, value);
+			} else {
+				mergeValueInMap(values, attribute, value);
+			}
+
 		} else {
 
 			// find correct child map where to add the value
@@ -63,11 +74,16 @@ public class TemplateContext {
 			Map<String, Object> targetMap = values;
 			for (int i = 0; i < attributes.length - 1; i++) {
 
-				if (targetMap.containsKey(attributes[i]) && targetMap.get(attributes[i]) instanceof Map) {
-					targetMap = (Map<String, Object>) targetMap.get(attributes[i]);
+				String attributeName = TextUtil.removeIndex(attributes[i]);
+				if (targetMap.containsKey(attributeName) && targetMap.get(attributeName) instanceof Map) {
+					targetMap = (Map<String, Object>) targetMap.get(attributeName);
+				} else if (targetMap.containsKey(attributeName) && targetMap.get(attributeName) instanceof List) {
+					int index = TextUtil.getIndex(attributes[i]);
+					List<Map<String, Object>> list = (List<Map<String, Object>>) targetMap.get(attributeName);
+					targetMap = list.get(index);
 				} else {
 					Map<String, Object> childMap = new HashMap<String, Object>();
-					targetMap.put(attributes[i], childMap);
+					targetMap.put(attributeName, childMap);
 					targetMap = childMap;
 				}
 			}
@@ -136,12 +152,26 @@ public class TemplateContext {
 			String attributes[] = attribute.split("\\.");
 			Map<String, Object> sourceMap = values;
 			for (int i = 0; i < attributes.length - 1; i++) {
-				if (!(sourceMap.get(attributes[i]) instanceof Map)) {
-					return "";
-				}
-				sourceMap = (Map<String, Object>) sourceMap.get(attributes[i]);
-			}
 
+				if (TextUtil.containsIndex(attributes[i])) {
+					int index = TextUtil.getIndex(attributes[i]);
+					String attributeName = TextUtil.removeIndex(attributes[i]);
+					if (!(sourceMap.get(attributeName) instanceof List)) {
+						return "";
+					}
+					List<Map<String, Object>> list = (List<Map<String, Object>>) sourceMap.get(attributeName);
+					if (list.size() < index + 1) {
+						return "";
+					}
+					sourceMap = list.get(index);
+
+				} else {
+					if (!(sourceMap.get(attributes[i]) instanceof Map)) {
+						return "";
+					}
+					sourceMap = (Map<String, Object>) sourceMap.get(attributes[i]);
+				}
+			}
 			value = sourceMap.get(attributes[attributes.length - 1]);
 		}
 
@@ -164,11 +194,76 @@ public class TemplateContext {
 		String[] results = new String[attributePaths.length];
 		for (int i = 0; i < attributePaths.length; i++) {
 			Object value = getValue(attributePaths[i]);
-			if (value instanceof String) {
-				results[i] = (String) value;
+			if (value != null) {
+				results[i] = (String) value.toString();
 			}
 		}
 
 		return results;
 	}
+
+	public List<String> expandTargetAttributes(String attributePath) {
+
+		List<String> paths = new ArrayList<>();
+
+		if (attributePath.indexOf("[].") == -1) {
+			paths.add(attributePath);
+			return paths;
+		}
+
+		expandPathSegment("", values, attributePath, paths);
+		return paths;
+	}
+
+	private void expandPathSegment(String currentPath, Map<String, Object> sourceMap, String remainingPath, List<String> results) {
+
+		String currentAttribute = TextUtil.getFirstSegment(remainingPath);
+
+		remainingPath = TextUtil.getNextSegments(remainingPath);
+
+		if (remainingPath == null) {
+			// we cannot go deeper
+			currentPath = TextUtil.addSegment(currentPath, currentAttribute);
+			results.add(currentPath);
+			return;
+		} else {
+			currentPath = TextUtil.addSegment(currentPath, TextUtil.removeIndex(currentAttribute));
+		}
+
+		if (TextUtil.containsIndex(currentAttribute)) {
+
+			int index = TextUtil.getIndex(currentAttribute);
+			currentAttribute = TextUtil.removeIndex(currentAttribute);
+
+			Object o = sourceMap.get(currentAttribute);
+			if (!(o instanceof List)) {
+				// invalid path
+				return;
+			}
+			List<Map<String, Object>> list = (List<Map<String, Object>>) sourceMap.get(currentAttribute);
+
+			if (index == -1) {
+				int listIndex = 0;
+				for (Map<String, Object> nextSourceMap : list) {
+					expandPathSegment(currentPath + "[" + listIndex++ + "]", nextSourceMap, remainingPath, results);
+				}
+			} else {
+				if (list.size() > index) {
+					Map<String, Object> nextSourceMap = list.get(index);
+					expandPathSegment(currentPath + "[" + index + "]", nextSourceMap, remainingPath, results);
+				}
+			}
+
+		} else {
+
+			if (!(sourceMap.get(currentAttribute) instanceof Map)) {
+				// path doesn't exist..
+				return;
+			}
+			Map<String, Object> nextSourceMap = (Map<String, Object>) sourceMap.get(currentAttribute);
+			expandPathSegment(currentPath, nextSourceMap, remainingPath, results);
+		}
+
+	}
+
 }

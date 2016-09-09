@@ -14,6 +14,7 @@ class FileLibrary:
 	remoteURL = 'http://127.0.0.1: 9889'
 
 	def _initialize_remote_library(self):
+		# TODO remove hardcoded path...
 		os.startfile('C:/robot-tests/resources/lib/start-filelibrary.bat')
 		time.sleep(1)
 		self.remoteLib = Remote(self.remoteURL)

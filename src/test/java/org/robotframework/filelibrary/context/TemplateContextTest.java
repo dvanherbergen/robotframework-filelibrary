@@ -50,9 +50,8 @@ public class TemplateContextTest {
 
 	@Test
 	public void canSetVariableWithJSONData() {
-		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n"
-				+ "    \"street\" : \"High Street\",\n" + "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n"
-				+ "  }\n" + "}";
+		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n" + "    \"street\" : \"High Street\",\n"
+				+ "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n" + "  }\n" + "}";
 		TemplateContext context = new TemplateContext();
 		context.setValue("user", json);
 
@@ -65,10 +64,29 @@ public class TemplateContextTest {
 	}
 
 	@Test
+	public void canSetValueInList() {
+		// @formatter:off
+		String json = "{ \"data\" : [\n" + 
+				"{ \"name\" : \"a\", \"elements\" : [ { \"name\" : \"a1\" }, { \"name\" : \"a2\" } ] },\n" + 
+				"{ \"name\" : \"b\", \"elements\" : [ { \"name\" : \"b1\" }, { \"name\" : \"b2\" } ] },\n" + 
+				"{ \"name\" : \"c\", \"elements\" : [] },\n" + 
+				"{ \"name\" : \"d\" }]}";
+		// @formatter:on
+		TemplateContext context = new TemplateContext();
+		context.setValuesFromJSON(json);
+
+		context.setValue("data[1].value", "test1");
+		Assert.assertEquals("test1", context.getValue("data[1].value"));
+
+		context.setValue("data[1].elements[1].value", "test1");
+		Assert.assertEquals("test1", context.getValue("data[1].elements[1].value"));
+
+	}
+
+	@Test
 	public void canInitializeVariablesFromJSON() {
-		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n"
-				+ "    \"street\" : \"High Street\",\n" + "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n"
-				+ "  }\n" + "}";
+		String json = "{\n" + "  \"name\" : \"Mr. Robot\",\n" + "  \"address\" : {\n" + "    \"street\" : \"High Street\",\n"
+				+ "    \"number\" : \"13\",\n" + "    \"postal\" : \"UX8\"\n" + "  }\n" + "}";
 		TemplateContext context = new TemplateContext();
 		context.setValuesFromJSON(json);
 
@@ -104,9 +122,9 @@ public class TemplateContextTest {
 	@Test
 	public void canGetValue() {
 
-		String json = "{\n" + "  \"criteria\" : {\n" + "    \"access_point\" : \"541454823041091814\",\n"
-				+ "    \"al_account_id\" : \"43940250\",\n" + "    \"al_acct_location_id\" : \"360467025\"\n" + "  },\n"
-				+ "  \"now\" : 1472724173166,\n" + "  \"name\" : \"My First Test\"\n" + "}";
+		String json = "{\n" + "  \"criteria\" : {\n" + "    \"access_point\" : \"541454823041091814\",\n" + "    \"al_account_id\" : \"43940250\",\n"
+				+ "    \"al_acct_location_id\" : \"360467025\"\n" + "  },\n" + "  \"now\" : 1472724173166,\n" + "  \"name\" : \"My First Test\"\n"
+				+ "}";
 		TemplateContext context = new TemplateContext();
 		context.setValuesFromJSON(json);
 
@@ -117,5 +135,127 @@ public class TemplateContextTest {
 		Assert.assertEquals("", context.getValue("criteria.access_point.ghost"));
 		Assert.assertEquals("", context.getValue("ghost.value"));
 
+	}
+
+	@Test
+	public void canGetValueByIndex() {
+
+		// @formatter:off
+		String json = "{ \"data\" : [\n" + 
+				"{ \"name\" : \"a\", \"elements\" : [ { \"name\" : \"a1\" }, { \"name\" : \"a2\" } ] },\n" + 
+				"{ \"name\" : \"b\", \"elements\" : [ { \"name\" : \"b1\" }, { \"name\" : \"b2\" } ] },\n" + 
+				"{ \"name\" : \"c\", \"elements\" : [] },\n" + 
+				"{ \"name\" : \"d\" }]}";
+		// @formatter:on
+		TemplateContext context = new TemplateContext();
+		context.setValuesFromJSON(json);
+
+		Assert.assertEquals("a", context.getValue("data[0].name"));
+		Assert.assertEquals("a1", context.getValue("data[0].elements[0].name"));
+		Assert.assertEquals("a2", context.getValue("data[0].elements[1].name"));
+		Assert.assertEquals("b", context.getValue("data[1].name"));
+		Assert.assertEquals("b1", context.getValue("data[1].elements[0].name"));
+		Assert.assertEquals("b2", context.getValue("data[1].elements[1].name"));
+		Assert.assertEquals("c", context.getValue("data[2].name"));
+		Assert.assertEquals("", context.getValue("data[2].elements[0].name"));
+		Assert.assertEquals("d", context.getValue("data[3].name"));
+		Assert.assertEquals("", context.getValue("data[3].elements[0].name"));
+
+	}
+
+	@Test
+	public void canExpandAttributePaths() {
+		// @formatter:off
+		String json = "{ \"soup\": {\n" + 
+				"     \"brand\" : \"Campbells\",\n" + 
+				"     \"type\" : \"Tomato\",\n" + 
+				"     \"color\" : \"red\",\n" + 
+				"     \"ingredients\" : [\n" + 
+				"         {\n" + 
+				"            \"name\" : \"tomato\",\n" + 
+				"            \"suppliers\" : [\n" + 
+				"               {\n" + 
+				"                  \"name\" : \"the best tomato company\",\n" + 
+				"                  \"contact\" : {\n" + 
+				"                     \"phone\" : \"555-555.555\"\n" + 
+				"                  }\n" + 
+				"               },\n" + 
+				"               {\n" + 
+				"                  \"name\" : \"the second best tomato company\",\n" + 
+				"                  \"contact\" : {\n" + 
+				"                     \"phone\" : \"666-666.666\"\n" + 
+				"                  }\n" + 
+				"               }\n" + 
+				"            ]\n" + 
+				"         },\n" + 
+				"         {\n" + 
+				"            \"name\" : \"potato\",\n" + 
+				"            \"suppliers\" : [\n" + 
+				"               { \"name\" : \"the only potato company\" }\n" + 
+				"            ]\n" + 
+				"         },\n" + 
+				"         {\n" + 
+				"            \"name\" : \"water\",\n" + 
+				"            \"suppliers\" : []\n" + 
+				"         },\n" + 
+				"         {\n" + 
+				"            \"name\" : \"pepper\",\n" + 
+				"            \"suppliers\" : [\n" + 
+				"               { \"name\" : \"the sweet pepper company\" },\n" + 
+				"               { \"name\" : \"the spicy pepper company\" }\n" + 
+				"            ]\n" + 
+				"         }\n" + 
+				"      ]\n" + 
+				"   }\n" + 
+				"}";
+		
+		// @formatter:on
+		TemplateContext context = new TemplateContext();
+		context.setValuesFromJSON(json);
+
+		List<String> expandedValues = context.expandTargetAttributes("soup.ingredients[].suppliers");
+		Assert.assertEquals(4, expandedValues.size());
+		Assert.assertEquals("soup.ingredients[0].suppliers", expandedValues.get(0));
+		Assert.assertEquals("soup.ingredients[1].suppliers", expandedValues.get(1));
+		Assert.assertEquals("soup.ingredients[2].suppliers", expandedValues.get(2));
+		Assert.assertEquals("soup.ingredients[3].suppliers", expandedValues.get(3));
+
+		expandedValues = context.expandTargetAttributes("soup.ingredients[].suppliers[].contact");
+		Assert.assertEquals(5, expandedValues.size());
+		Assert.assertEquals("soup.ingredients[0].suppliers[0].contact", expandedValues.get(0));
+		Assert.assertEquals("soup.ingredients[0].suppliers[1].contact", expandedValues.get(1));
+		Assert.assertEquals("soup.ingredients[1].suppliers[0].contact", expandedValues.get(2));
+		Assert.assertEquals("soup.ingredients[3].suppliers[0].contact", expandedValues.get(3));
+		Assert.assertEquals("soup.ingredients[3].suppliers[1].contact", expandedValues.get(4));
+
+		expandedValues = context.expandTargetAttributes("soup.ingredients[1].suppliers[].contact");
+		Assert.assertEquals(1, expandedValues.size());
+		Assert.assertEquals("soup.ingredients[1].suppliers[0].contact", expandedValues.get(0));
+
+		expandedValues = context.expandTargetAttributes("soup.ingredients[0].suppliers[0].contact");
+		Assert.assertEquals(1, expandedValues.size());
+		Assert.assertEquals("soup.ingredients[0].suppliers[0].contact", expandedValues.get(0));
+
+		expandedValues = context.expandTargetAttributes("soup.ingredients[].suppliers[]");
+		Assert.assertEquals(4, expandedValues.size());
+		Assert.assertEquals("soup.ingredients[0].suppliers[]", expandedValues.get(0));
+		Assert.assertEquals("soup.ingredients[1].suppliers[]", expandedValues.get(1));
+		Assert.assertEquals("soup.ingredients[2].suppliers[]", expandedValues.get(2));
+		Assert.assertEquals("soup.ingredients[3].suppliers[]", expandedValues.get(3));
+
+		expandedValues = context.expandTargetAttributes("soup.brand[].suppliers[]");
+		Assert.assertEquals(0, expandedValues.size());
+
+		expandedValues = context.expandTargetAttributes("data.test[]");
+		Assert.assertEquals(1, expandedValues.size());
+		Assert.assertEquals("data.test[]", expandedValues.get(0));
+
+		expandedValues = context.expandTargetAttributes("data.data2.data3.test[]");
+		Assert.assertEquals(1, expandedValues.size());
+		Assert.assertEquals("data.data2.data3.test[]", expandedValues.get(0));
+
+		expandedValues = context.expandTargetAttributes("data.data2.data3");
+		Assert.assertEquals(1, expandedValues.size());
+		Assert.assertEquals("data.data2.data3", expandedValues.get(0));
 	}
 }

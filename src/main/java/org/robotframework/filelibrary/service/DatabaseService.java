@@ -75,16 +75,41 @@ public class DatabaseService {
 		}
 	}
 
-	public List<Map<String, Object>> executeQuery(String sql) {
-		return executeQuery(sql, 0);
+	public List<Map<String, Object>> DELETEexecuteQuery(String sql) {
+		return DELETEexecuteQuery(sql, 0);
 	}
 
-	public List<Map<String, Object>> executeQuery(String sql, int maxResults) {
+	public List<Map<String, Object>> executeQuery(String sql, String[] parameters, int maxResults) {
 		try {
 			Connection con = getConnection();
 
 			StatementParser parser = new StatementParser(sql);
+			PreparedStatement stmt = con.prepareStatement(parser.getStatement());
 
+			int i = 1;
+			for (String param : parameters) {
+				System.out.println("Setting sql param " + i + " to '" + param + "'");
+				stmt.setString(i, param);
+				i++;
+			}
+
+			System.out.println("Executing stmt: \n" + parser.getStatement());
+			stmt.setQueryTimeout(queryTimeOut);
+			stmt.setMaxRows(maxResults);
+			long start = System.currentTimeMillis();
+			ResultSet rs = stmt.executeQuery();
+			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
+			return toMap(rs);
+		} catch (SQLException e) {
+			throw new FileLibraryException(e);
+		}
+	}
+
+	public List<Map<String, Object>> DELETEexecuteQuery(String sql, int maxResults) {
+		try {
+			Connection con = getConnection();
+
+			StatementParser parser = new StatementParser(sql);
 			PreparedStatement stmt = con.prepareStatement(parser.getStatement());
 
 			int i = 1;
@@ -165,7 +190,7 @@ public class DatabaseService {
 
 			int i = 1;
 			for (String paramValue : parameters) {
-				System.out.println("Setting sql param '" + i + "' to '" + paramValue + "'");
+				System.out.println("Setting sql param " + i + " to '" + paramValue + "'");
 				stmt.setString(i, paramValue);
 				i++;
 			}
