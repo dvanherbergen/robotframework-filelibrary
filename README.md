@@ -7,23 +7,12 @@ RobotFramework library for generating data files.
 
 
 ## TODO
-
+- add jdbc jar to lib param
+- remove hardcoded start param  
 - get template variable list?
-- loop over data list and inject further query results
 - bulk inserts
 - procedure calls
-- retrieve data into var (not only
-- queries
-	AP
-	AP-With-...
-	AP-With-...
 - support null parameter in where clause
-- Configurable data source:
-	SQL
-	REST?
-	JSON?
-	XLS
-
 ? load datafiles into DB using DBUnit
 ? compare datafiles with custom diff
 ? add compression for large datasets?
