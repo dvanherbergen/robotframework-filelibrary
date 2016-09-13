@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:messages
+	xmlns:ns1="http://www.example.com/ns1"
+	xmlns:ns2="http://www.example.com/ns2"
+	xmlns:ent="http://www.example.com/Entities"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	ent:Sender="0000000000000"
+	ent:FileID="aezer-123_AZE234-FER-345"
+	ent:MessageType="ABC" 
+	ent:CreateDate="2016-07-27T15:00:00+01:00"
+	ent:SentDate="2016-07-26T16:16:24+01:00" >
+	<ns1:Message>
+		<ns2:Header>
+			<ent:MessageDateTime>2016-02-18T11:30:40Z</ent:MessageDateTime>
+			<ent:Module>E23</ent:Module>
+			<ent:Label>ID3</ent:Label>
+			<ent:Sector>28</ent:Sector>
+		</ns2:Header>
+		<ns2:Payload>
+			<ns2:HeaderPayload>
+				<ent:ContextId>String</ent:ContextId>
+				<ent:TransactionId>String</ent:TransactionId>
+				<ent:TicketNumber>Date</ent:TicketNumber>
+			</ns2:HeaderPayload>
+			<ns2:Payload>
+				<ns2:nr>ABC1234</ns2:nr>
+				<ns2:Object>
+					<ent:SerialNumber>12345</ent:SerialNumber>
+					<ent:Register>
+						<ent:Id>TH</ent:Id>
+						<ent:Index>
+							<ent:IndexDate>2015-10-05T00:00:00Z</ent:IndexDate>
+							<ent:Quantity>12881</ent:Quantity>
+		
+							<ent:RegistrationDateTime>2015-10-05T22:05:03Z
+							</ent:RegistrationDateTime>
+						</ent:Index>
+					</ent:Register>
+				</ns2:Object>
+			
+			</ns2:Payload>
+			<ns2:CorrelationId>IMD_COR_92b4da63-029b-4c4f-a45a-3df376d0e89e
+			</ns2:CorrelationId>
+		</ns2:Payload>
+	</ns1:Message>
+</ns1:messages>

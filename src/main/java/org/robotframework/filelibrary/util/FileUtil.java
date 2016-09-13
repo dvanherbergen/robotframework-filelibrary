@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,63 +148,6 @@ public class FileUtil {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
-		}
-
-	}
-
-	public static void compareFiles(String filePath1, String filePath2) {
-
-		// TODO add better support for XML comparisons
-		// TODO add ignore wildcards
-
-		File file1 = new File(filePath1);
-		if (!file1.exists()) {
-			throw new FileLibraryException("Cannot find '" + file1.getAbsolutePath() + "'");
-		}
-		File file2 = new File(filePath2);
-		if (!file2.exists()) {
-			throw new FileLibraryException("Cannot find '" + file2.getAbsolutePath() + "'");
-		}
-
-		BufferedReader reader1 = null;
-		BufferedReader reader2 = null;
-
-		try {
-			reader1 = new BufferedReader(new InputStreamReader(new FileInputStream(file1)));
-			reader2 = new BufferedReader(new InputStreamReader(new FileInputStream(file2)));
-
-			String line1 = null;
-			String line2 = null;
-
-			while ((line1 = reader1.readLine()) != null) {
-				line2 = reader2.readLine();
-
-				if (line2 == null) {
-					throw new FileLibraryException("Missing line: " + line1);
-				}
-
-				if (!TextUtil.matches(line1, line2)) {
-					throw new FileLibraryException("Lines do not match: \n" + line1 + "\n" + line2);
-				}
-
-			}
-
-			if ((line2 = reader2.readLine()) != null) {
-				throw new FileLibraryException("Found unexpected line: " + line2);
-			}
-		} catch (IOException e) {
-			throw new FileLibraryException(e);
-		} finally {
-			try {
-				reader1.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				reader2.close();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 
