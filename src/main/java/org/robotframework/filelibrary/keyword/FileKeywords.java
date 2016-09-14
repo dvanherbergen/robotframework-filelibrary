@@ -1,5 +1,8 @@
 package org.robotframework.filelibrary.keyword;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.robotframework.filelibrary.util.CompareUtil;
 import org.robotframework.filelibrary.util.FileUtil;
 import org.robotframework.javalib.annotation.ArgumentNames;
@@ -29,15 +32,23 @@ public class FileKeywords {
 		CompareUtil.compareFiles(file1, file2);
 	}
 
-	@RobotKeyword("Verify that the content of two xml files matches.\n Whitespace is ignored."
+
+	@RobotKeyword("Verify that the content of two xml files matches.\n Whitespace and formatting is ignored.\n"
+			+ "Replace values of nodes or attributes with the string #{IGNORE} to exclude them from comparisson.\n"
+			+ "Provide xpath filters to exclude certain nodes from comparison. (only basic xpath support)\n"
 			+ "\n"
 			+ "Usage:\n"
-			+ "| Verify XML Files Are Equal | _file1_ | _file2_ |")
-	@ArgumentNames({ "file1", "file2" })
-	public void verifyXMLFilesAreEqual(String file1, String file2) {
-		CompareUtil.compareXMLFiles(file1, file2);
+			+ "| Verify XML Files Are Equal | _file1_ | _file2_ |\n"
+			+ "| Verify XML Files Are Equal | _file1_ | _file2_ | _xpathFilter1_ \n"
+			+ "| Verify XML Files Are Equal | _file1_ | _file2_ | _xpathFilter1_ | _xpathFilter2_ ")
+	@ArgumentNames({ "file1", "file2", "*filters" })
+	public void verifyXMLFilesAreEqual(String file1, String file2, String... filters) {
+		HashSet<String> filterSet = new HashSet<String>();
+		filterSet.addAll(Arrays.asList(filters));
+		CompareUtil.compareXMLFiles(file1, file2, filterSet);
 	}
-
+	
+	
 	@RobotKeyword("Compress multiple files into a single zip file.\n"
 			+ "\n"
 			+ "Usage:\n"

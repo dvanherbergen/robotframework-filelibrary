@@ -25,7 +25,7 @@
 						<ent:Id>ignored with filter</ent:Id>
 						<ent:Index>
 							<ent:IndexDate>2015-10-05T00:00:00Z</ent:IndexDate>
-							<ent:Quantity>12881</ent:Quantity>
+							<ent:Quantity>error</ent:Quantity>
 		
 							<ent:RegistrationDateTime>#{IGNORE}
 							</ent:RegistrationDateTime>
