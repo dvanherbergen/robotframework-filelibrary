@@ -14,5 +14,3 @@ RobotFramework library for generating data files.
 - procedure calls
 - support null parameter in where clause
 ? load datafiles into DB using DBUnit
-? compare datafiles with custom diff
-? add compression for large datasets?

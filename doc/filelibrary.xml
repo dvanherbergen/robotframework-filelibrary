@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20160909 17:34:28" type="library" name="FileLibrary" format="ROBOT">
+<keywordspec generated="20160914 14:25:22" type="library" name="FileLibrary" format="ROBOT">
 <version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
 <doc>FileLibrary is a Robot Framework test library for generating test data files.
-Built in variables: now</doc>
+
+Built in variables: ${now}, ${today}
+
+For SQL related commands, you can specify SQL satements either directly in the argument or provide them in an .sql file. 
+
+
+ | *IMPORTANT* | For statements included directly in the test case, you need to escape any template data variables. If you do not, it will not be able to find the value. | 
+ | _Example_ | Execute SQL	update mytable set value = 2 where id = \${my_id} | 
+</doc>
 <kw name="Concatenate Files">
 <arguments>
 <arg>targetFile</arg>
@@ -33,6 +41,20 @@ Usage:
 <arguments>
 </arguments>
 <doc>Close SQL session</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Execute Query">
+<arguments>
+<arg>sql</arg>
+</arguments>
+<doc>Execute SQL Query. Returns a list of values. When the query selects a single column, a simple list of values is returned.
+When the query selects multiple columns a list of lists is returned.
+Example usage:
+ | @{singleColResult}= | Execute Query | select 1 from dual union select 2 from dual | 
+ | Log Many | @{singleColResult} | | 
+ | @{multiColResult}= | Execute Query | select 1,2 from dual union select 3,4 from dual | 
+ | Log Many | ${singleColResult[2]} | |</doc>
 <tags>
 </tags>
 </kw>
@@ -127,8 +149,8 @@ Example usage:
 | Set Template Data From SQL | soup | soup-select.sql |
 | Set Template Data From SQL | soup | select brand, type, color from soups where id = 1 |
 | Set Template Data From SQL | soup.ingredients[] | select i.name from ingredients i, soup_ingredients si where i.id = si.ingredient_id and si.soup_id = 1 |
-| Set Template Data From SQL | soup.ingredients[].suppliers | select s.name from suppliers s, ingredient_suppliers is where s.id = is.supplier_id and is.ingredient_name = ${soup.ingredients[].name}  |
-| Set Template Data From SQL | soup.ingredients[].suppliers[].contact | select c.phone from supplier_contact c where c.supplier_name = ${soup.ingredients[].suppliers[].name} |
+| Set Template Data From SQL | soup.ingredients[].suppliers | select s.name from suppliers s, ingredient_suppliers is where s.id = is.supplier_id and is.ingredient_name = \${soup.ingredients[].name}  |
+| Set Template Data From SQL | soup.ingredients[].suppliers[].contact | select c.phone from supplier_contact c where c.supplier_name = \${soup.ingredients[].suppliers[].name} |
 
 
 The examples shown above could result in the following template data structure:
@@ -203,6 +225,24 @@ Usage:
 <arg>*values</arg>
 </arguments>
 <doc>Execute a SQL statement or .sql file and verify that returned values match the expected values.</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Verify XML Files Are Equal">
+<arguments>
+<arg>file1</arg>
+<arg>file2</arg>
+<arg>*filters</arg>
+</arguments>
+<doc>Verify that the content of two xml files matches.
+ Whitespace and formatting is ignored.
+Replace values of nodes or attributes with the string #{IGNORE} to exclude them from comparisson.
+Provide xpath filters to exclude certain nodes from comparison. (only basic xpath support)
+
+Usage:
+| Verify XML Files Are Equal | _file1_ | _file2_ |
+| Verify XML Files Are Equal | _file1_ | _file2_ | _xpathFilter1_ 
+| Verify XML Files Are Equal | _file1_ | _file2_ | _xpathFilter1_ | _xpathFilter2_</doc>
 <tags>
 </tags>
 </kw>

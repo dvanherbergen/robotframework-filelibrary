@@ -8,6 +8,7 @@ import java.util.List;
 import org.robotframework.filelibrary.FileLibraryException;
 import org.robotframework.filelibrary.context.TemplateContext;
 import org.robotframework.filelibrary.util.CsvUtil;
+import org.robotframework.filelibrary.util.TextUtil;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.RobotKeyword;
 import org.robotframework.javalib.annotation.RobotKeywordOverload;
@@ -46,7 +47,12 @@ public class ContextKeywords {
 	@RobotKeyword("Set a variable in the template context. The value can be either a string or a JSON string.")
 	@ArgumentNames({ "attribute", "value" })
 	public void setTemplateData(String name, String value) {
-		TemplateContext.getInstance().setValue(name, value);
+
+		if (TextUtil.isVariable(value)) {
+			TemplateContext.getInstance().setValueFromTemplateData(name, value);
+		} else {
+			TemplateContext.getInstance().setValue(name, value);
+		}
 	}
 
 	@RobotKeywordOverload

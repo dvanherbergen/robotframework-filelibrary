@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.robotframework.filelibrary.FileLibraryException;
-import org.robotframework.filelibrary.context.TemplateContext;
 import org.robotframework.filelibrary.util.StatementParser;
 import org.robotframework.filelibrary.util.TextUtil;
 
@@ -75,11 +74,50 @@ public class DatabaseService {
 		}
 	}
 
-	public List<Map<String, Object>> DELETEexecuteQuery(String sql) {
-		return DELETEexecuteQuery(sql, 0);
+	public List<Map<String, Object>> getQueryResultsAsMap(String sql, String[] parameters, int maxResults) {
+		try {
+			return toMap(getQueryResults(sql, parameters, maxResults));
+		} catch (SQLException e) {
+			throw new FileLibraryException(e);
+		}
 	}
 
-	public List<Map<String, Object>> executeQuery(String sql, String[] parameters, int maxResults) {
+	public List<Object> getQueryResultsAsList(String sql, String[] parameters, int maxResults) {
+		try {
+
+			List<Object> results = new ArrayList<>();
+			ResultSet rs = getQueryResults(sql, parameters, maxResults);
+
+			ResultSetMetaData metadata = rs.getMetaData();
+			int columns = metadata.getColumnCount();
+
+			while (rs.next()) {
+
+				List<String> columnValues = new ArrayList<>();
+
+				for (int i = 0; i < columns; i++) {
+
+					String value = rs.getString(i + 1);
+					if (value == null) {
+						value = "";
+					}
+					columnValues.add(value);
+				}
+
+				if (columnValues.size() == 1) {
+					results.add(columnValues.get(0));
+				} else {
+					results.add(columnValues);
+				}
+			}
+			return results;
+
+		} catch (SQLException e) {
+			throw new FileLibraryException(e);
+		}
+	}
+
+	private ResultSet getQueryResults(String sql, String[] parameters, int maxResults) {
 		try {
 			Connection con = getConnection();
 
@@ -99,38 +137,7 @@ public class DatabaseService {
 			long start = System.currentTimeMillis();
 			ResultSet rs = stmt.executeQuery();
 			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
-			return toMap(rs);
-		} catch (SQLException e) {
-			throw new FileLibraryException(e);
-		}
-	}
-
-	public List<Map<String, Object>> DELETEexecuteQuery(String sql, int maxResults) {
-		try {
-			Connection con = getConnection();
-
-			StatementParser parser = new StatementParser(sql);
-			PreparedStatement stmt = con.prepareStatement(parser.getStatement());
-
-			int i = 1;
-			for (String param : parser.getParameters()) {
-
-				Object v = TemplateContext.getInstance().getValue(param);
-				if (v == null) {
-					throw new FileLibraryException("No value found for parameter '" + param + "'.");
-				}
-				String paramValue = v.toString();
-				System.out.println("Setting sql param '" + param + "' to '" + paramValue + "'");
-				stmt.setString(i, paramValue);
-				i++;
-			}
-			System.out.println("Executing stmt: \n" + parser.getStatement());
-			stmt.setQueryTimeout(queryTimeOut);
-			stmt.setMaxRows(maxResults);
-			long start = System.currentTimeMillis();
-			ResultSet rs = stmt.executeQuery();
-			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
-			return toMap(rs);
+			return rs;
 		} catch (SQLException e) {
 			throw new FileLibraryException(e);
 		}

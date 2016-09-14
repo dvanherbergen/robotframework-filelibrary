@@ -51,6 +51,10 @@ public class TemplateContext {
 		setAttributeValue(attribute, expandJsonValue(value));
 	}
 
+	public void setValueFromTemplateData(String attribute, String value) {
+		setAttributeValue(attribute, TemplateContext.getInstance().getValue(TextUtil.getVariableName(value)));
+	}
+
 	@SuppressWarnings("unchecked")
 	private void setAttributeValue(String attribute, Object value) {
 

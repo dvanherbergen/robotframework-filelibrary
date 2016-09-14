@@ -132,4 +132,15 @@ public class TextUtil {
 
 		return result;
 	}
+
+	public static boolean isVariable(String value) {
+		return value != null && value.startsWith("${") && value.endsWith("}");
+	}
+
+	public static String getVariableName(String value) {
+		if (!isVariable(value)) {
+			return value;
+		}
+		return value.substring(2, value.length() - 1);
+	}
 }

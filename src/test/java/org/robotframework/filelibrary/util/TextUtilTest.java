@@ -53,4 +53,17 @@ public class TextUtilTest {
 		testPopulateIndex("a[1].b[2].c", "a[].b[].g", "a[1].b[2].g");
 		testPopulateIndex("a[1].b[2].c", "a[0].b[0].g", "a[0].b[0].g");
 	}
+
+	@Test
+	public void canDetectVariable() {
+		Assert.assertTrue(TextUtil.isVariable("${something}"));
+		Assert.assertFalse(TextUtil.isVariable("${something"));
+		Assert.assertFalse(TextUtil.isVariable("#{something}"));
+	}
+
+	@Test
+	public void canGetVariableName() {
+		Assert.assertEquals("test", TextUtil.getVariableName("${test}"));
+		Assert.assertEquals("test1", TextUtil.getVariableName("test1"));
+	}
 }

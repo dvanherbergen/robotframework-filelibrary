@@ -49,6 +49,33 @@ public class DatabaseKeywords {
 		}
 	}
 
+	// @formatter:off
+	@RobotKeyword("Execute SQL Query. Returns a list of values. When the query selects a single column, a simple list of values is returned.\n"
+			+ "When the query selects multiple columns a list of lists is returned.\n" +
+	"Example usage:\n"
+	+ " | @{singleColResult}= | Execute Query | select 1 from dual union select 2 from dual | \n"
+	+ " | Log Many | @{singleColResult} | | \n"	
+	+ " | @{multiColResult}= | Execute Query | select 1,2 from dual union select 3,4 from dual | \n"
+	+ " | Log Many | ${singleColResult[2]} | | \n")
+	// @formatter:on	
+	@ArgumentNames({ "sql" })
+	public List<Object> executeQuery(String sql) {
+
+		List<String> sqls = new ArrayList<>();
+		if (FileUtil.isSqlFileName(sql)) {
+			sqls = FileUtil.parseSQLStatements(sql);
+		} else {
+			sqls.add(sql);
+		}
+
+		if (sqls.size() != 1) {
+			throw new FileLibraryException("Only a single SQL Query is allowed in the .sql file for this keyword.");
+		}
+
+		StatementParser parser = new StatementParser(sqls.get(0));
+		return service.getQueryResultsAsList(parser.getStatement(), TemplateContext.getInstance().resolveAttributes(parser.getParameters()), 0);
+	}
+
 	@RobotKeyword("Execute a SQL statement or .sql file and verify that returned values match the expected values.")
 	@ArgumentNames({ "sql", "*values" })
 	public void verifySQLResult(String sql, String... expectedValues) {
@@ -73,16 +100,6 @@ public class DatabaseKeywords {
 		}
 	}
 
-	private List<String> getSQLStatements(String input) {
-		List<String> sqls = new ArrayList<>();
-		if (FileUtil.isSqlFileName(input)) {
-			sqls = FileUtil.parseSQLStatements(input);
-		} else {
-			sqls.add(input);
-		}
-		return sqls;
-	}
-
 	// @formatter:off
 	@RobotKeyword("Load template data from SQL results. Specify either an SQL to execute or the path to a .sql file.\n" + 
 			"\n" + 
@@ -97,8 +114,8 @@ public class DatabaseKeywords {
 			"| Set Template Data From SQL | soup | soup-select.sql |\n" + 
 			"| Set Template Data From SQL | soup | select brand, type, color from soups where id = 1 |\n" + 
 			"| Set Template Data From SQL | soup.ingredients[] | select i.name from ingredients i, soup_ingredients si where i.id = si.ingredient_id and si.soup_id = 1 |\n" + 
-			"| Set Template Data From SQL | soup.ingredients[].suppliers | select s.name from suppliers s, ingredient_suppliers is where s.id = is.supplier_id and is.ingredient_name = ${soup.ingredients[].name}  |\n" + 
-			"| Set Template Data From SQL | soup.ingredients[].suppliers[].contact | select c.phone from supplier_contact c where c.supplier_name = ${soup.ingredients[].suppliers[].name} |\n" + 
+			"| Set Template Data From SQL | soup.ingredients[].suppliers | select s.name from suppliers s, ingredient_suppliers is where s.id = is.supplier_id and is.ingredient_name = \\${soup.ingredients[].name}  |\n" + 
+			"| Set Template Data From SQL | soup.ingredients[].suppliers[].contact | select c.phone from supplier_contact c where c.supplier_name = \\${soup.ingredients[].suppliers[].name} |\n" + 
 			"\n\nThe examples shown above could result in the following template data structure:\n\n" + 
 			"| { \"soup\": {\n" + 
 			"|      \"brand\" : \"Campbells\",\n" + 
@@ -162,7 +179,7 @@ public class DatabaseKeywords {
 				StatementParser parser = new StatementParser(stmt);
 				String[] parameters = TextUtil.populateIndexes(attributePath, parser.getParameters());
 				parameters = TemplateContext.getInstance().resolveAttributes(parameters);
-				List<Map<String, Object>> records = DatabaseService.getInstance().executeQuery(parser.getStatement(), parameters,
+				List<Map<String, Object>> records = DatabaseService.getInstance().getQueryResultsAsMap(parser.getStatement(), parameters,
 						(targetIsList ? 0 : 1));
 				System.out.println("Query returned " + records.size() + " result.");
 				if (!records.isEmpty()) {
