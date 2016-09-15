@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20160915 10:04:51" type="library" name="FileLibrary" format="ROBOT">
+<keywordspec generated="20160915 13:10:38" type="library" name="FileLibrary" format="ROBOT">
 <version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
@@ -13,6 +13,22 @@ For SQL related commands, you can specify SQL satements either directly in the a
  | *IMPORTANT* | For statements included directly in the test case, you need to escape any template data variables. If you do not, it will not be able to find the value. | 
  | _Example_ | Execute SQL	update mytable set value = 2 where id = \${my_id} | 
 </doc>
+<init>
+<arguments>
+<arg>path=</arg>
+</arguments>
+<doc>FileLibrary is a Robot Framework test library for generating test data files.
+
+Built in variables: ${now}, ${today}
+
+For SQL related commands, you can specify SQL satements either directly in the argument or provide them in an .sql file. 
+
+
+ | *IMPORTANT* | For statements included directly in the test case, you need to escape any template data variables. If you do not, it will not be able to find the value. | 
+ | _Example_ | Execute SQL	update mytable set value = 2 where id = \${my_id} |</doc>
+<tags>
+</tags>
+</init>
 <kw name="Concatenate Files">
 <arguments>
 <arg>targetFile</arg>

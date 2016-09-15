@@ -6,16 +6,26 @@ import time
 from robot.libraries.BuiltIn import BuiltIn
 from robot.utils.normalizing import NormalizedDict
 from robot.libraries.Remote import Remote
+from robot.libraries.Process import Process
 
 class FileLibrary:
 	
 	ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 	remoteLib = None
 	remoteURL = 'http://127.0.0.1: 9889'
+	driverPath = ''
 
+	def __init__(self, path=''):
+		self.driverPath = path
+		
 	def _initialize_remote_library(self):
-		# TODO remove hardcoded path...
-		os.startfile('C:/robot-tests/resources/lib/start-filelibrary.bat')
+		print 'starting file libary...'
+		debugArg = '-agentlib:jdwp=transport=dt_socket,address=8001,server=y,suspend=n'
+		classPath = self.driverPath + os.pathsep + os.environ['PYTHONPATH']
+		mainClass = 'org.robotframework.filelibrary.remote.RPCServer'
+		port = 9889
+		print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, port) 
+		Process().start_process('java', debugArg, "-cp", classPath, mainClass, port, shell=True, cwd='')		
 		time.sleep(1)
 		self.remoteLib = Remote(self.remoteURL)
 
@@ -34,6 +44,8 @@ class FileLibrary:
 		return FileLibrary_Keywords.keyword_arguments[name]
 
 	def get_keyword_documentation(self, name):
+		if name == '__init__':
+			return FileLibrary_Keywords.keyword_documentation['__intro__']
 		return FileLibrary_Keywords.keyword_documentation[name]
 
 	def run_keyword(self, name, arguments, kwargs):
