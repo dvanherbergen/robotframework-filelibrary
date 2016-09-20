@@ -76,6 +76,16 @@ public class DatabaseKeywords {
 		return service.getQueryResultsAsList(parser.getStatement(), TemplateContext.getInstance().resolveAttributes(parser.getParameters()), 0);
 	}
 
+	@RobotKeyword("Execute SQL Query and results a single result. See Execute Query for details")
+	@ArgumentNames({ "sql" })
+	public Object executeSingleResultQuery(String sql) {
+		List<Object> result = executeQuery(sql);
+		if (result.size() != 1) {
+			throw new FileLibraryException("Expected a single result, got " + result.size() + " records instead");
+		}
+		return result.get(0);
+	}
+
 	@RobotKeyword("Execute a SQL statement or .sql file and verify that returned values match the expected values.")
 	@ArgumentNames({ "sql", "*values" })
 	public void verifySQLResult(String sql, String... expectedValues) {

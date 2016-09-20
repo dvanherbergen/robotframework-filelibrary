@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20160915 13:10:38" type="library" name="FileLibrary" format="ROBOT">
+<keywordspec generated="20160920 10:31:19" type="library" name="FileLibrary" format="ROBOT">
 <version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
@@ -71,6 +71,14 @@ Example usage:
  | Log Many | @{singleColResult} | | 
  | @{multiColResult}= | Execute Query | select 1,2 from dual union select 3,4 from dual | 
  | Log Many | ${singleColResult[2]} | |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Execute Single Result Query">
+<arguments>
+<arg>sql</arg>
+</arguments>
+<doc>Execute SQL Query and results a single result. See Execute Query for details</doc>
 <tags>
 </tags>
 </kw>
