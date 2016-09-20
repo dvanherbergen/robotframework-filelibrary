@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.robotframework.filelibrary.FileLibraryException;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Comparison;

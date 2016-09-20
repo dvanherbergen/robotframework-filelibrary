@@ -55,7 +55,7 @@ public class FileUtil {
 					statement.append(line);
 				}
 			}
-
+			reader.close();
 			if (statement.length() > 0) {
 				statements.add(statement.toString());
 			}

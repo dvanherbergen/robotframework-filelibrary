@@ -95,6 +95,7 @@ public class TemplateContext {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void mergeValueInMap(Map targetMap, String attribute, Object value) {
 
 		if (value instanceof Map && targetMap.containsKey(attribute) && targetMap.get(attribute) instanceof Map) {
@@ -144,6 +145,7 @@ public class TemplateContext {
 		setAttributeValue(attribute, value);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object getValue(String attribute) {
 
 		Object value = null;
@@ -219,6 +221,7 @@ public class TemplateContext {
 		return paths;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void expandPathSegment(String currentPath, Map<String, Object> sourceMap, String remainingPath, List<String> results) {
 
 		String currentAttribute = TextUtil.getFirstSegment(remainingPath);
