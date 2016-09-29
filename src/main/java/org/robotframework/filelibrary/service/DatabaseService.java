@@ -64,7 +64,6 @@ public class DatabaseService {
 
 	public void disconnect() {
 		try {
-			Connection con = getConnection();
 			if (con != null && !con.isClosed()) {
 				con.close();
 				System.out.println("Connection closed.");

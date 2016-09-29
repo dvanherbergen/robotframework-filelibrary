@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 import org.robotframework.filelibrary.FileLibraryException;
 import org.robotframework.filelibrary.context.TemplateContext;
@@ -88,13 +87,6 @@ public class ContextKeywords {
 
 		List<?> records = CsvUtil.loadValuesFromFile(file);
 		TemplateContext.getInstance().setValueList(variableName, records);
-	}
-
-	@RobotKeyword("Get a random UUID. \nThe UUID is generated using a cryptographically strong pseudo "
-			+ " random number generator. \n Example: (961420eb-89ea-4f06-856f-6fff663add5a)")
-	public String getRandomUUID() {
-
-		return UUID.randomUUID().toString();
 	}
 
 }

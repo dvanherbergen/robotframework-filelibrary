@@ -1,7 +1,11 @@
 package org.robotframework.filelibrary.remote;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.BindException;
+import java.util.UUID;
 
 import org.robotframework.filelibrary.FileLibrary;
 import org.robotframework.remoteserver.RemoteServer;
@@ -10,24 +14,18 @@ public class RPCServer extends RemoteServer {
 
 	private static RPCServer instance;
 
-	private RemoteServer server;
-
-	public static final String FLAG_FILE = "file-library.pid";
-
 	public static RPCServer getInstance() {
 		return instance;
 	}
 
-	public void run(int port) throws Exception {
+	public void run() throws Exception {
 
-		server = new RemoteServer();
-		server.putLibrary("/RPC2", new FileLibrary());
-		server.setPort(port);
-		server.setAllowStop(true);
-		server.start();
-		Integer actualPort = server.getLocalPort();
+		this.putLibrary("/RPC2", new FileLibrary());
+		this.setPort(0);
+		this.setAllowStop(true);
+		this.start();
+		Integer actualPort = this.getLocalPort();
 		System.out.println("Started server on port " + actualPort + ".");
-		new File(FLAG_FILE).createNewFile();
 
 	}
 
@@ -40,36 +38,57 @@ public class RPCServer extends RemoteServer {
 				try {
 					Thread.sleep(500);
 					server.stop();
+					System.out.println("Server stopped.");
 				} catch (Exception e) {
+					System.out.println("Error Stopping Server ");
 					e.printStackTrace();
 				}
 			}
 		};
-
-		new File(FLAG_FILE).deleteOnExit();
 		new Thread(delayedStop).start();
 		System.out.println("Server stop requested.");
-
 	}
 
 	public static void main(String[] args) {
 
 		try {
-			int port = 4813;
-			if (args.length == 1) {
-				port = Integer.parseInt(args[0]);
-			}
-			System.out.println("Starting server on port " + port + " ...");
 			try {
 				instance = new RPCServer();
-				instance.run(port);
+				instance.run();
+				Integer localPort = instance.getLocalPort();
+				File pidFile = createPidFile(args);
+				writePortToPidFile(pidFile, localPort);
 			} catch (BindException e) {
-				System.out.println("Cannot bind to port. There is probably another instance running.");
+				System.out.println("Cannot bind to port.");
 				System.exit(1);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+
+	private static void writePortToPidFile(File pidFile, Integer localPort) throws FileNotFoundException {
+		PrintWriter out = new PrintWriter(pidFile);
+		out.write(localPort.toString());
+		out.close();
+	}
+
+	private static File createPidFile(String[] args) {
+		String uniqueId;
+		if (args.length != 1) {
+			uniqueId = UUID.randomUUID().toString();
+		} else {
+			uniqueId = args[0];
+		}
+		File pidFile = new File(uniqueId + ".pid");
+
+		try {
+			pidFile.createNewFile();
+		} catch (IOException e1) {
+			System.out.println("pid file " + pidFile.getPath() + " already exists.");
+			System.exit(1);
+		}
+		return pidFile;
 	}
 
 }

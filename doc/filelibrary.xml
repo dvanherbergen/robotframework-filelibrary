@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20160920 10:31:19" type="library" name="FileLibrary" format="ROBOT">
+<keywordspec generated="20160929 11:23:44" type="library" name="FileLibrary" format="ROBOT">
 <version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
@@ -105,12 +105,17 @@ Usage:
 <tags>
 </tags>
 </kw>
+<kw name="Get File Library Server Pid">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
 <kw name="Get Random UUID">
 <arguments>
 </arguments>
-<doc>Get a random UUID. 
-The UUID is generated using a cryptographically strong pseudo  random number generator. 
- Example: (961420eb-89ea-4f06-856f-6fff663add5a)</doc>
+<doc></doc>
 <tags>
 </tags>
 </kw>
