@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.robotframework.filelibrary.FileLibraryException;
 import org.robotframework.filelibrary.util.JsonUtil;
 import org.robotframework.filelibrary.util.TextUtil;
 
@@ -53,6 +55,32 @@ public class TemplateContext {
 
 	public void setValueFromTemplateData(String attribute, String value) {
 		setAttributeValue(attribute, TemplateContext.getInstance().getValue(TextUtil.getVariableName(value)));
+	}
+
+	public void setValueFromClonedTemplateData(String attribute, String value) {
+		Object result = TemplateContext.getInstance().getValue(TextUtil.getVariableName(value));
+		Object clonedResult = clone(result, 0);
+		setAttributeValue(attribute, clonedResult);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object clone(Object value, int depth) {
+		if (depth > 1000) {
+			throw new FileLibraryException("Cloning of map with depth > 1000 currently not supported");
+		}
+		if (value instanceof Map) {
+			Map copyFromMap = (Map) value;
+			Map copyToMap = new LinkedHashMap();
+			Iterator<String> it = copyFromMap.keySet().iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				Object valueToMerge = copyFromMap.get(key);
+				copyToMap.put(key, clone(valueToMerge, depth + 1));
+			}
+			return copyToMap;
+		}
+		return value;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,7 +136,7 @@ public class TemplateContext {
 				mergeToMap.put(key, valueToMerge);
 			}
 		} else {
-			targetMap.put(attribute, value);
+			targetMap.put(attribute, clone(value, 0));
 		}
 
 	}

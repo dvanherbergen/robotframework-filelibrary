@@ -2,11 +2,15 @@ package org.robotframework.filelibrary.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class TemplateContextTest {
@@ -25,6 +29,74 @@ public class TemplateContextTest {
 		Map<String, Object> level1 = (Map<String, Object>) context.getValues().get("cars");
 		Map<String, Object> level2 = (Map<String, Object>) level1.get("ford");
 		Assert.assertEquals("2016", level2.get("mustang"));
+	}
+
+	@Test
+	public void valuesCanBeCloned() throws Exception {
+		TemplateContext context = TemplateContext.getInstance();
+		context.setValue("B", "{\"key\" : \"102\", \"value\" : \"B\"}");
+		context.setValue("C", "{\"key\" : \"103\", \"value\" : \"C\"}");
+		assertValue(context, "B.key", "102");
+		assertValue(context, "B.value", "B");
+		assertValue(context, "C.key", "103");
+		assertValue(context, "C.value", "C");
+
+		log();
+
+		context.setValueFromTemplateData("A", "${B}");
+		log();
+
+		assertValue(context, "A.key", "102");
+		assertValue(context, "A.value", "B");
+
+		assertValue(context, "B.key", "102");
+		assertValue(context, "B.value", "B");
+		assertValue(context, "C.key", "103");
+		assertValue(context, "C.value", "C");
+
+		context.setValueFromTemplateData("A", "${C}");
+		log();
+
+		assertValue(context, "A.key", "103");
+		assertValue(context, "A.value", "C");
+
+		assertValue(context, "B.key", "102");
+		assertValue(context, "B.value", "B");
+		assertValue(context, "C.key", "103");
+		assertValue(context, "C.value", "C");
+
+	}
+
+	private void log() throws Exception {
+		ObjectWriter writer = new ObjectMapper().writer();
+		System.out.println("---- Current template");
+		String string = writer.writeValueAsString(TemplateContext.getInstance());
+		log("A");
+		log("B");
+		log("C");
+	}
+
+	private void log(String prop) {
+		TemplateContext instance = TemplateContext.getInstance();
+		Object value = instance.getValue(prop);
+		String outVal = "";
+		if (value instanceof Map) {
+			outVal += "{";
+			Map map = (Map) value;
+			Iterator<String> it = map.keySet().iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				Object obj = map.get(key);
+				outVal += key + "=" + obj + " " + obj.getClass().getName() + "@" + System.identityHashCode(obj) + " ";
+			}
+			outVal += "}";
+		}
+		System.out.println(prop + "=" + outVal + " " + value.getClass().getName() + " @ " + System.identityHashCode(value));
+	}
+
+	private void assertValue(TemplateContext context, String name, String value) {
+		String obj = (String) context.getValue(name);
+		Assert.assertEquals(value, obj);
 	}
 
 	@Test
