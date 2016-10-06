@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class TemplateContextTest {
@@ -41,10 +40,10 @@ public class TemplateContextTest {
 		assertValue(context, "C.key", "103");
 		assertValue(context, "C.value", "C");
 
-		log();
+		log(context);
 
 		context.setValueFromTemplateData("A", "${B}");
-		log();
+		log(context);
 
 		assertValue(context, "A.key", "102");
 		assertValue(context, "A.value", "B");
@@ -55,7 +54,7 @@ public class TemplateContextTest {
 		assertValue(context, "C.value", "C");
 
 		context.setValueFromTemplateData("A", "${C}");
-		log();
+		log(context);
 
 		assertValue(context, "A.key", "103");
 		assertValue(context, "A.value", "C");
@@ -67,31 +66,27 @@ public class TemplateContextTest {
 
 	}
 
-	private void log() throws Exception {
-		ObjectWriter writer = new ObjectMapper().writer();
-		System.out.println("---- Current template");
-		String string = writer.writeValueAsString(TemplateContext.getInstance());
-		log("A");
-		log("B");
-		log("C");
+
+
+	private void log(TemplateContext context) throws Exception {
+		System.out.println("---- Current context = " + new ObjectMapper().writeValueAsString(context.getValues()));
+
 	}
 
-	private void log(String prop) {
-		TemplateContext instance = TemplateContext.getInstance();
-		Object value = instance.getValue(prop);
+	private void log(String key, Object value) {
 		String outVal = "";
 		if (value instanceof Map) {
 			outVal += "{";
 			Map map = (Map) value;
 			Iterator<String> it = map.keySet().iterator();
 			while (it.hasNext()) {
-				String key = it.next();
-				Object obj = map.get(key);
-				outVal += key + "=" + obj + " " + obj.getClass().getName() + "@" + System.identityHashCode(obj) + " ";
+				String subKey = it.next();
+				Object obj = map.get(subKey);
+				outVal += subKey + ":" + obj + " " + obj.getClass().getName() + "@" + System.identityHashCode(obj) + " ";
 			}
 			outVal += "}";
 		}
-		System.out.println(prop + "=" + outVal + " " + value.getClass().getName() + " @ " + System.identityHashCode(value));
+		System.out.println(key + "=" + outVal + " " + value.getClass().getName() + " @ " + System.identityHashCode(value));
 	}
 
 	private void assertValue(TemplateContext context, String name, String value) {
@@ -99,6 +94,20 @@ public class TemplateContextTest {
 		Assert.assertEquals(value, obj);
 	}
 
+	@Test
+	public void canSetArrayValues() throws Exception {
+		TemplateContext context = new TemplateContext();
+		context.setValue("Records[0].test", "test0");
+		log(context);
+		context.setValue("Records[1].test", "test1");
+		log(context);
+		context.setValue("Records[2].test", "test2");
+
+		log(context);
+		assertValue(context, "Records[0].test", "test0");
+		assertValue(context, "Records[1].test", "test1");
+		assertValue(context, "Records[2].test", "test2");
+	}
 	@Test
 	public void nestedVariableCanBeAdded() {
 		TemplateContext context = new TemplateContext();

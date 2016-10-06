@@ -112,15 +112,37 @@ public class TemplateContext {
 				} else if (targetMap.containsKey(attributeName) && targetMap.get(attributeName) instanceof List) {
 					int index = TextUtil.getIndex(attributes[i]);
 					List<Map<String, Object>> list = (List<Map<String, Object>>) targetMap.get(attributeName);
+					ensureSize(list, index);
 					targetMap = list.get(index);
 				} else {
-					Map<String, Object> childMap = new HashMap<String, Object>();
-					targetMap.put(attributeName, childMap);
-					targetMap = childMap;
+					// attribute does not yet exists
+					if (TextUtil.containsIndex(attributes[i])) {
+						// create new list at attibuteName location
+						List<Map<String, Object>> childList = new ArrayList<Map<String, Object>>();
+						targetMap.put(attributeName, childList);
+						// put an empty map at the correct index
+						int index = TextUtil.getIndex(attributes[i]);
+						ensureSize(childList, index);
+						targetMap = new HashMap<String, Object>();
+						childList.set(i, targetMap);
+					} else {
+						// create new map
+						Map<String, Object> childMap = new HashMap<String, Object>();
+						targetMap.put(attributeName, childMap);
+						targetMap = childMap;
+					}
 				}
 			}
 			mergeValueInMap(targetMap, attributes[attributes.length - 1], value);
 		}
+	}
+
+	private void ensureSize(List<Map<String, Object>> childList, int index) {
+		int existingSize = childList.size();
+		for (int i = 0; i < index + 1 - existingSize; i++) {
+			childList.add(new HashMap<String, Object>());
+		}
+
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
