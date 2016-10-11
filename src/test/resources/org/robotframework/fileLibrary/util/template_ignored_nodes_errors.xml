@@ -4,13 +4,13 @@
 	xmlns:ns2="http://www.example.com/ns2"
 	xmlns:ent="http://www.example.com/Entities"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	ent:Sender="#{IGNORE}"
-	ent:FileID="#{IGNORE}"
+	ent:Sender="{IGNORE}"
+	ent:FileID="{IGNORE}"
 	ent:MessageType="ABC" 
 	ent:CreateDate="2016-07-26T15:00:00+01:00"
 	ent:SentDate="2016-07-26T16:16:24+01:00" >
 	<ns1:Message>
-		<ns2:Header>#{Ignored with filter}</ns2:Header>
+		<ns2:Header>{Ignored with filter}</ns2:Header>
 		<ns2:Payload>
 			<ns2:HeaderPayload>
 				<ent:ContextId>String</ent:ContextId>
@@ -27,7 +27,7 @@
 							<ent:IndexDate>2015-10-05T00:00:00Z</ent:IndexDate>
 							<ent:Quantity>error</ent:Quantity>
 		
-							<ent:RegistrationDateTime>#{IGNORE}
+							<ent:RegistrationDateTime>{IGNORE}
 							</ent:RegistrationDateTime>
 						</ent:Index>
 					</ent:Register>

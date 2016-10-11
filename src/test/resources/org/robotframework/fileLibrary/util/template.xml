@@ -4,7 +4,7 @@
 	xmlns:ns2="http://www.example.com/ns2"
 	xmlns:ent="http://www.example.com/Entities"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	ent:Sender="#{IGNORE}"
+	ent:Sender="{IGNORE}"
 	ent:FileID="aezer-123_AZE234-FER-345"
 	ent:MessageType="ABC" 
 	ent:CreateDate="2016-07-26T15:00:00+01:00"
@@ -12,7 +12,7 @@
 	<ns1:Message>
 		<ns2:Header>
 			<ent:MessageDateTime>2016-02-18T11:30:40Z</ent:MessageDateTime>
-			<ent:Module>#{IGNORE}</ent:Module>
+			<ent:Module>{IGNORE}</ent:Module>
 			<ent:Label>ID3</ent:Label>
 			<ent:Sector>27</ent:Sector>
 		</ns2:Header>

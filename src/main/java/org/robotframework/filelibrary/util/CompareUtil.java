@@ -19,7 +19,7 @@ import org.xmlunit.diff.DifferenceEvaluators;
 
 public class CompareUtil {
 
-	public static final String WILDCARD = "#{IGNORE}";
+	public static final String WILDCARD = "{IGNORE}";
 
 	public static void compareXMLFiles(String templateFilePath, String actualFilePath) {
 		compareXMLFiles(templateFilePath, actualFilePath, new HashSet<String>());
