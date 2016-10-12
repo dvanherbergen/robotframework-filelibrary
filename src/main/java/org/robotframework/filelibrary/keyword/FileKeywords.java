@@ -20,8 +20,9 @@ public class FileKeywords {
 			+ "| Concatenate Files | _targetFile_ | _sourceFile1_ | _sourceFile2_ | _sourceFile3_ |")
 	@ArgumentNames({ "targetFile", "*sourceFiles" })
 	public void concatenateFiles(String targetFile, String... sourceFiles) {
-		FileUtil.appendFiles(targetFile, sourceFiles);
+		FileUtil.concatenateFiles(targetFile, sourceFiles);
 	}
+
 
 	@RobotKeyword("Verify that the content of two files matches. Files are compared line by line.\n"
 			+ "\n"
@@ -46,6 +47,14 @@ public class FileKeywords {
 		HashSet<String> filterSet = new HashSet<String>();
 		filterSet.addAll(Arrays.asList(filters));
 		CompareUtil.compareXMLFiles(file1, file2, filterSet);
+	}
+	
+	@RobotKeyword("Apply XSLT. Transforms XML file by applying an xlst transformation.\n"
+			+ "Usage:\n"
+			+ "| Apply XSLT | _sourceFile_ | _templateFile_ | _targetFile_|")
+	@ArgumentNames({ "sourceFile", "templateFile", "targetFile" })
+	public void applyXSLT(String sourceFile, String templateFile, String targetFile) {
+		FileUtil.xsltTransfrom(sourceFile, templateFile, targetFile);
 	}
 	
 	

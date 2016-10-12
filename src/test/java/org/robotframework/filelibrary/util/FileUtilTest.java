@@ -46,4 +46,5 @@ public class FileUtilTest {
 		Assert.assertEquals(false, FileUtil.isSqlFileName("select * from table"));
 
 	}
+
 }

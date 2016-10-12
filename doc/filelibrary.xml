@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20161011 16:26:25" type="library" name="FileLibrary" format="ROBOT">
+<keywordspec generated="20161012 14:19:26" type="library" name="FileLibrary" format="ROBOT">
 <version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
@@ -29,6 +29,18 @@ For SQL related commands, you can specify SQL satements either directly in the a
 <tags>
 </tags>
 </init>
+<kw name="Apply XSLT">
+<arguments>
+<arg>sourceFile</arg>
+<arg>templateFile</arg>
+<arg>targetFile</arg>
+</arguments>
+<doc>Apply XSLT. Transforms XML file by applying an xlst transformation.
+Usage:
+| Apply XSLT | _sourceFile_ | _templateFile_ | _targetFile_|</doc>
+<tags>
+</tags>
+</kw>
 <kw name="Concatenate Files">
 <arguments>
 <arg>targetFile</arg>

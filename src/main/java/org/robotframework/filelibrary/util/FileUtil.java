@@ -3,6 +3,7 @@ package org.robotframework.filelibrary.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,6 +14,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.robotframework.filelibrary.FileLibraryException;
 
@@ -75,28 +83,15 @@ public class FileUtil {
 		return value != null && sqlFilenamePattern.matcher(value.trim().toLowerCase()).matches();
 	}
 
-	public static void appendFiles(String targetFile, String... sourceFiles) {
+	public static void concatenateFiles(String targetFile, String... sourceFiles) {
 
 		OutputStream out = null;
-		InputStream in = null;
 
 		try {
-
-			out = new FileOutputStream(targetFile);
-			byte[] buf = new byte[4096];
+			out = new FileOutputStream(targetFile, true);
 			for (String file : sourceFiles) {
 
-				File inputFile = new File(file);
-				if (!inputFile.exists()) {
-					throw new FileLibraryException("File not found " + inputFile.getAbsolutePath());
-				}
-				in = new FileInputStream(inputFile);
-				int b = 0;
-				while ((b = in.read(buf)) >= 0) {
-					out.write(buf, 0, b);
-					out.flush();
-				}
-				in.close();
+				appendToFile(out, file);
 			}
 		} catch (IOException e) {
 			throw new FileLibraryException(e);
@@ -111,6 +106,22 @@ public class FileUtil {
 		}
 	}
 
+	private static void appendToFile(OutputStream out, String file) throws FileNotFoundException, IOException {
+		InputStream in;
+		byte[] buf = new byte[4096];
+		File inputFile = new File(file);
+		if (!inputFile.exists()) {
+			throw new FileLibraryException("File not found " + inputFile.getAbsolutePath());
+		}
+		in = new FileInputStream(inputFile);
+		int b = 0;
+		while ((b = in.read(buf)) >= 0) {
+			out.write(buf, 0, b);
+			out.flush();
+		}
+		in.close();
+	}
+
 	public static void compressFiles(String targetFile, String[] sourceFiles) {
 
 		ZipOutputStream out = null;
@@ -118,9 +129,9 @@ public class FileUtil {
 		try {
 
 			out = new ZipOutputStream(new FileOutputStream(targetFile));
-			byte[] buffer = new byte[4096];
 			for (String file : sourceFiles) {
 
+				byte[] buffer = new byte[4096];
 				File inputFile = new File(file);
 				if (!inputFile.exists()) {
 					throw new FileLibraryException("File not found " + inputFile.getAbsolutePath());
@@ -149,6 +160,22 @@ public class FileUtil {
 					e.printStackTrace();
 				}
 			}
+		}
+
+	}
+
+	public static void xsltTransfrom(String sourceFile, String templateFile, String resultFile) {
+		try {
+			File source = new File(sourceFile); // source file
+			File target = new File(resultFile); // result file
+			File template = new File(templateFile); // template file
+			TransformerFactory f = TransformerFactory.newInstance();
+			Transformer t = f.newTransformer(new StreamSource(template));
+			Source s = new StreamSource(source);
+			Result r = new StreamResult(target);
+			t.transform(s, r);
+		} catch (Exception e) {
+			throw new FileLibraryException(e);
 		}
 
 	}
