@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec generated="20161012 14:19:26" type="library" name="FileLibrary" format="ROBOT">
+<keywordspec generated="20161020 12:06:35" type="library" name="FileLibrary" format="ROBOT">
 <version></version>
 <scope>global</scope>
 <namedargs>yes</namedargs>
@@ -16,6 +16,7 @@ For SQL related commands, you can specify SQL satements either directly in the a
 <init>
 <arguments>
 <arg>path=</arg>
+<arg>debug=False</arg>
 </arguments>
 <doc>FileLibrary is a Robot Framework test library for generating test data files.
 

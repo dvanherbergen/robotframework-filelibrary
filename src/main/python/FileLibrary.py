@@ -20,8 +20,9 @@ class FileLibrary:
 	PROCESS = None
 	KEYWORDS = ['get_file_library_server_pid' , 'get_random_UUID']
 
-	def __init__(self, path=''):
+	def __init__(self, path='', debug=False):
 		self.driverPath = path
+		self.debug = debug
 		self.PROCESS = Process()
 		
 	def _initialize_remote_library(self):
@@ -30,9 +31,12 @@ class FileLibrary:
 		classPath = self.driverPath + os.pathsep + os.environ['PYTHONPATH']
 		mainClass = 'org.robotframework.filelibrary.remote.RPCServer'
 		pidUUID = str(uuid.uuid4())
-		
-		print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, pidUUID) 
-		self.PROCESS.start_process('java', debugArg, "-cp", classPath, mainClass, pidUUID, shell=True, cwd='', alias='rpcServer')
+		if self.debug:
+			print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, pidUUID) 
+			self.PROCESS.start_process('java', debugArg, "-cp", classPath, mainClass, pidUUID, shell=True, cwd='', alias='rpcServer')
+		else:
+			print("starting process ", 'java', "-cp", classPath, mainClass, pidUUID) 
+			self.PROCESS.start_process('java', "-cp", classPath, mainClass, pidUUID, shell=True, cwd='', alias='rpcServer')
 		i = 0
 # Wait till file is created max wait = 10 seconds
 		while not os.path.exists(pidUUID+'.pid') and i < 200:
