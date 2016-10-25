@@ -1,4 +1,4 @@
-package org.robotframework.filelibrary.context;
+package org.robotframework.filelibrary.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.robotframework.filelibrary.context.TemplateContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -66,8 +67,6 @@ public class TemplateContextTest {
 
 	}
 
-
-
 	private void log(TemplateContext context) throws Exception {
 		System.out.println("---- Current context = " + new ObjectMapper().writeValueAsString(context.getValues()));
 
@@ -108,6 +107,7 @@ public class TemplateContextTest {
 		assertValue(context, "Records[1].test", "test1");
 		assertValue(context, "Records[2].test", "test2");
 	}
+
 	@Test
 	public void nestedVariableCanBeAdded() {
 		TemplateContext context = new TemplateContext();
