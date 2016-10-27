@@ -1,6 +1,7 @@
 import FileLibrary_Keywords
 import json
 import os
+import sys
 import time
 import inspect
 import uuid
@@ -18,6 +19,7 @@ class FileLibrary:
 	remoteURL = 'http://127.0.0.1:'
 	driverPath = ''
 	PROCESS = None
+	AGENT_PATH = os.path.abspath(os.path.dirname(__file__))
 	KEYWORDS = ['get_file_library_server_pid' , 'get_random_UUID']
 
 	def __init__(self, path='', debug=False):
@@ -28,7 +30,12 @@ class FileLibrary:
 	def _initialize_remote_library(self):
 		print 'starting file libary...'
 		debugArg = '-agentlib:jdwp=transport=dt_socket,address=8001,server=y,suspend=n'
-		classPath = self.driverPath + os.pathsep + os.environ['PYTHONPATH']
+		jars = set(filter(lambda k: k.endswith('.jar'), sys.path))
+		jars.add(self.driverPath)
+		jars.add(FileLibrary.AGENT_PATH)
+		jars.add(os.environ.get('PYTHONPATH',''))
+		jarSet = set(filter (None, jars ))
+		classPath = os.pathsep.join(jars)
 		mainClass = 'org.robotframework.filelibrary.remote.RPCServer'
 		pidUUID = str(uuid.uuid4())
 		if self.debug:

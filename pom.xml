@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.robotframework</groupId>
 	<artifactId>filelibrary</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.9.0</version>
 	<name>robotframework-filelibrary</name>
 	<description>Robotframework library for generating data files.</description>
 	<licenses>
@@ -100,6 +100,78 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.robotframework</groupId>
+				<artifactId>robotframework-maven-plugin</artifactId>
+				<version>1.4.6</version>
+				<executions>
+					<execution>
+						<id>xml-spec</id>
+						<phase>package</phase>
+						<goals>
+							<goal>libdoc</goal>
+						</goals>
+						<configuration>
+							<libdoc>
+								<version>${project.version}</version>
+								<outputFile>filelibrary-${project.version}.xml</outputFile>
+								<extraPathDirectories>
+									<extraPathDirectory>${project.build.directory}/filelibrary-${project.version}.jar</extraPathDirectory>
+								</extraPathDirectories>
+								<libraryOrResourceFile>FileLibrary</libraryOrResourceFile>
+							</libdoc>
+						</configuration>
+					</execution>
+					<execution>
+						<id>html-doc</id>
+						<phase>package</phase>
+						<goals>
+							<goal>libdoc</goal>
+						</goals>
+						<configuration>
+							<libdoc>
+								<version>${project.version}</version>
+								<outputFile>filelibrary-${project.version}.html</outputFile>
+								<extraPathDirectories>
+									<extraPathDirectory>${project.build.directory}/filelibrary-${project.version}.jar</extraPathDirectory>
+								</extraPathDirectories>
+								<libraryOrResourceFile>FileLibrary</libraryOrResourceFile>
+							</libdoc>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.12</version>
+				<executions>
+					<execution>
+						<id>attach-artifacts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>target/robotframework/libdoc/filelibrary-${project.version}.html</file>
+									<type>html</type>
+									<classifier>libdoc</classifier>
+								</artifact>
+								<artifact>
+									<file>target/robotframework/libdoc/filelibrary-${project.version}.xml</file>
+									<type>xml</type>
+									<classifier>libdoc</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1.1</version>
@@ -114,38 +186,6 @@
 							<mainClass>org.robotframework.filelibrary.util.KeywordGenerator</mainClass>
 							<arguments>
 								<argument>target/classes/FileLibrary_Keywords.py</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>xml-doc</id>
-						<phase>install</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>python</executable>
-							<arguments>
-								<argument>-m</argument>
-								<argument>robot.libdoc</argument>
-								<argument>FileLibrary</argument>
-								<argument>${project.basedir}/doc/filelibrary.xml</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>html-doc</id>
-						<phase>install</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>python</executable>
-							<arguments>
-								<argument>-m</argument>
-								<argument>robot.libdoc</argument>
-								<argument>FileLibrary</argument>
-								<argument>${project.basedir}/doc/filelibrary.html</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -200,7 +240,15 @@
 			<version>2.2.1</version>
 		</dependency>
 
-
 	</dependencies>
 
+
+
+	<distributionManagement>
+		<repository>
+			<id>libs-release-local</id>
+			<name>libs-release-local</name>
+			<url>http://localhost:8081/artifactory/libs-release-local</url>
+		</repository>
+	</distributionManagement>
 </project>
