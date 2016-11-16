@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonUtil {
 
-	public static String toJSON(Map<String, Object> map) {
+	public static String toJSON(Object obj) {
 
 		try {
-			return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(map);
+			return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
 			throw new FileLibraryException(e);
 		}

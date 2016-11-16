@@ -8,6 +8,7 @@ import java.util.List;
 import org.robotframework.filelibrary.FileLibraryException;
 import org.robotframework.filelibrary.context.TemplateContext;
 import org.robotframework.filelibrary.util.CsvUtil;
+import org.robotframework.filelibrary.util.JsonUtil;
 import org.robotframework.filelibrary.util.TextUtil;
 import org.robotframework.javalib.annotation.ArgumentNames;
 import org.robotframework.javalib.annotation.RobotKeyword;
@@ -42,6 +43,21 @@ public class ContextKeywords {
 		}
 		System.out.println("Found value '" + result + "'");
 		return result;
+	}
+
+	@RobotKeyword("Get a specific value from the template data context and return it as a JSON String")
+	@ArgumentNames("attribute")
+	public String getTemplateDataAsJSON(String attributeName) {
+		Object value = TemplateContext.getInstance().getValue(attributeName);
+		System.out.println("Found value '" + value + "'");
+		return JsonUtil.toJSON(value);
+	}
+
+	@RobotKeyword("Get a specific value from the template data context and return it as an object (so no to string conversion)")
+	@ArgumentNames("attribute")
+	public Object getTemplateDataAsVariable(String attributeName) {
+		Object value = TemplateContext.getInstance().getValue(attributeName);
+		return value;
 	}
 
 	@RobotKeyword("Set a variable in the template context. The value can be either a string or a JSON string.")
