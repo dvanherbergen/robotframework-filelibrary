@@ -1,8 +1,12 @@
 package org.robotframework.filelibrary.keyword;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.robotframework.filelibrary.FileLibraryException;
 import org.robotframework.filelibrary.context.TemplateContext;
@@ -92,6 +96,55 @@ public class DatabaseKeywords {
 
 		StatementParser parser = new StatementParser(sql);
 		service.verifyQueryResults(parser.getStatement(), TemplateContext.getInstance().resolveAttributes(parser.getParameters()), expectedValues);
+	}
+
+	@RobotKeyword("Call a stored procedure with the given parameters \n"
+			+ "Example: Call Procedure    {call robot.hello_world (?,?,?,?)}     name    123456    45.66    {d}2016-01-21\n"
+			+ "Most parameter types will be detected and converted automatically, however sometimes you might need to specify the type. \n"
+			+ "    - Use {i} to pass the value as a number\n" + "    - Use {f} to pass the value as a decimal\n"
+			+ "    - Use {d} to pass the value as a date in format yyyy-mm-dd")
+	@ArgumentNames({ "sql", "*values" })
+	public void callProcedure(String sql, String... parameters) {
+		Object[] objParams = convertParams(parameters);
+
+		service.executeProcedure(sql, objParams);
+	}
+
+	private Object[] convertParams(String[] parameters) {
+		List<Object> params = new ArrayList<Object>();
+		for (String string : parameters) {
+			params.add(convertParam(string));
+		}
+		return params.toArray();
+	}
+
+	private Object convertParam(String param) {
+		Pattern pattern = Pattern.compile("\\{(.)\\}(.*)$");
+		Matcher matcher = pattern.matcher(param);
+		if (matcher.matches()) {
+			String type = matcher.group(1);
+			String value = matcher.group(2);
+			return convertParamToType(type, value);
+		} else {
+			return param;
+		}
+	}
+
+	private Object convertParamToType(String type, String value) {
+		switch (type) {
+		case "i":
+			return Integer.parseInt(value);
+		case "f":
+			return Double.parseDouble(value);
+		case "d":
+			try {
+				return new SimpleDateFormat("yyyy-mm-dd").parse(value);
+			} catch (ParseException e) {
+				throw new FileLibraryException("Could not parse " + value + " as a date with format yyyy-mm-dd");
+			}
+
+		}
+		return value;
 	}
 
 	@RobotKeyword("Close SQL session")

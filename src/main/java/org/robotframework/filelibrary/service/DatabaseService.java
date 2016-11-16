@@ -1,5 +1,6 @@
 package org.robotframework.filelibrary.service;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,6 +255,45 @@ public class DatabaseService {
 			throw new FileLibraryException(e);
 		}
 
+	}
+
+	public void executeProcedure(String statement, Object[] parameters) {
+		try {
+			Connection con = getConnection();
+			CallableStatement stmt = con.prepareCall(statement);
+
+			System.out.println("Executing stmt: \n" + statement);
+
+			int i = 1;
+			for (Object paramValue : parameters) {
+				System.out.println("Setting sql param '" + i + "' to '" + paramValue + "' + type " + paramValue.getClass().getName());
+				if (paramValue instanceof String) {
+					stmt.setString(i, (String) paramValue);
+				} else if (paramValue instanceof Integer) {
+					stmt.setInt(i, (Integer) paramValue);
+				} else if (paramValue instanceof Double) {
+					stmt.setDouble(i, (Double) paramValue);
+				} else if (paramValue instanceof Date) {
+					Date utilDate = (Date) paramValue;
+					stmt.setDate(i, new java.sql.Date(utilDate.getTime()));
+				} else {
+					stmt.setString(i, (String) paramValue);
+				}
+				i++;
+			}
+			stmt.setQueryTimeout(queryTimeOut);
+			long start = System.currentTimeMillis();
+			Boolean result = stmt.execute();
+			System.out.println("" + (System.currentTimeMillis() - start) + " ms to execute query.");
+			if (result) {
+				throw new FileLibraryException(
+						"Expected no result from calling procedure yet got a result set. Is your statement really a {call ... } statement?");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new FileLibraryException(e);
+		}
 	}
 
 }
