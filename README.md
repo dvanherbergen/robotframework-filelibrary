@@ -1,19 +1,27 @@
 # robotframework-filelibrary
-RobotFramework library for generating data files.
 
+The robot framework file library extends the capabilities of [robot framework|http://robotframework.org] with new keywords that allow:
+* Generation of files from templates using test context, CSV or SQL as input
+* Compare, concatenate, zip or apply XSLT transformation on files
+* Execution of SQL files for manipulating a database
+* Loading of test data into the database from xls files.
+
+
+## Keyword documentation
+
+For more information on all the available keywords, please consult the [keyword documentation](docs/filelibrary.html).
 
 ## Usage
-- add jdbc driver jar + filelibrary jar to PYTHONPATH env or specify jdbcdriver as argument for filelibrary
 
-*** Settings ***
-Library           FileLibrary
-Library           FileLibrary    ${jdbcDriverPath}
-
-*** Test Cases ***
-Test SQL Verification
-    Verify SQL Result    select 1,2,3 from dual    1    2    3
-
+See [examples](demo/). 
 
 ## TODO
-? support null parameter in where clause
-? load datafiles into DB using DBUnit
+
+* support null parameter in where clause
+* load datafiles into DB using DBUnit
+* add demo
+* add docs
+* setup distribution to maven central
+
+
+

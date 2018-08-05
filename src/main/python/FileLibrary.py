@@ -36,7 +36,7 @@ class FileLibrary:
 		jars.add(os.environ.get('PYTHONPATH',''))
 		jarSet = set(filter (None, jars ))
 		classPath = os.pathsep.join(jars)
-		mainClass = 'org.robotframework.filelibrary.remote.RPCServer'
+		mainClass = 'io.github.dvanherbergen.filelibrary.remote.RPCServer'
 		pidUUID = str(uuid.uuid4())
 		if self.debug:
 			print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, pidUUID) 

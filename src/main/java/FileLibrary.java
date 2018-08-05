@@ -1,4 +1,4 @@
 
-public class FileLibrary extends org.robotframework.filelibrary.FileLibrary {
+public class FileLibrary extends io.github.dvanherbergen.filelibrary.FileLibrary {
 
 }
