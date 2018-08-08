@@ -312,15 +312,16 @@ public class DatabaseService {
 	public void loadFromXls(String xlsFilePath, String schema, boolean clear) {
 		try {
 
-			DatabaseConnection connection = new DatabaseConnection(con);
+			DatabaseConnection connection = null;
+			if (StringUtils.isNotBlank(schema)) {
+				connection = new DatabaseConnection(con, schema);	
+			} else {
+				connection = new DatabaseConnection(con);
+			}
+			
 			DatabaseConfig config = connection.getConfig();
 			config.setProperty("http://www.dbunit.org/properties/escapePattern", "\"?\"");
 			config.setProperty("http://www.dbunit.org/features/batchedStatements", "true");
-			config.setProperty("http://www.dbunit.org/properties/datatypeFactory", new org.dbunit.ext.mysql.MySqlDataTypeFactory());
-
-			if (StringUtils.isNotBlank(schema)) {
-				executeStatement("SET SCHEMA " + schema, new String[] {});
-			}
 
 			File data = new File(xlsFilePath);
 			if (!data.exists() || ! data.canRead()) {
@@ -328,18 +329,26 @@ public class DatabaseService {
 			}
 			
 			IDataSet dataSet = new XlsDataSet(new FileInputStream(data));
-			if (dataSet != null) {
-				con.setAutoCommit(true);
-				if (clear) {
-					DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
-				} else {
-					DatabaseOperation.REFRESH.execute(connection, dataSet);
-				}
-				con.setAutoCommit(false);
+			con.setAutoCommit(true);
+			if (clear) {
+				DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
+			} else {
+				DatabaseOperation.REFRESH.execute(connection, dataSet);
 			}
+			con.setAutoCommit(false);
 
 		} catch (DatabaseUnitException | SQLException | IOException e) {
-			throw new FileLibraryException("Error loading data from " + xlsFilePath + " : " + e.getClass().getSimpleName() + " : " + e.getMessage(), e);
+			StringBuilder builder = new StringBuilder("Error loading data from " + xlsFilePath + " : " + e.getClass().getSimpleName() + " : " + e.getMessage());
+			Throwable t = e.getCause();
+			while(t != null) {
+				builder.append("\n Caused by: ")
+					.append(t.getClass().getSimpleName())
+					.append(": ")
+					.append(t.getMessage());
+				t = t.getCause();
+			}
+			throw new FileLibraryException(builder.toString(), e);
 		}
 	}
+	
 }
