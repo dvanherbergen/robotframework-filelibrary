@@ -58,10 +58,9 @@ public class DatabaseService {
 		return con;
 	}
 
-	public void connect(String driver, String url, String user, String password) {
+	public void connect(String url, String user, String password) {
 
 		try {
-			Class.forName(driver);
 			if (user == null || user.length() == 0) {
 				con = DriverManager.getConnection(url);
 			} else {

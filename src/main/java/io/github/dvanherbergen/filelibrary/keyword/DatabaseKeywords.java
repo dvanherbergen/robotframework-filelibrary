@@ -27,9 +27,9 @@ public class DatabaseKeywords {
 	DatabaseService service = DatabaseService.getInstance();
 
 	@RobotKeyword("Connect to database using the specified arguments")
-	@ArgumentNames({ "driver", "url", "user", "password" })
-	public void connect(String driver, String url, String user, String password) {
-		service.connect(driver, url, user, password);
+	@ArgumentNames({ "url", "user", "password" })
+	public void connect(String url, String user, String password) {
+		service.connect(url, user, password);
 	}
 
 	@RobotKeyword("Set timeout for SQL executions. The default timeout is 30 seconds.")
