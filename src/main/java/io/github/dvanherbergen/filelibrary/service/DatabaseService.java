@@ -25,6 +25,7 @@ import org.dbunit.dataset.excel.XlsDataSet;
 import org.dbunit.operation.DatabaseOperation;
 
 import io.github.dvanherbergen.filelibrary.FileLibraryException;
+import io.github.dvanherbergen.filelibrary.util.PrimaryKeyFilter;
 import io.github.dvanherbergen.filelibrary.util.StatementParser;
 import io.github.dvanherbergen.filelibrary.util.TextUtil;
 
@@ -307,9 +308,10 @@ public class DatabaseService {
 
 	/**
 	 * Load an XLS file into the database using DBUnit.
+	 * @param primaryKeys 
 	 * @param path
 	 */
-	public void loadFromXls(String xlsFilePath, String schema, boolean clear) {
+	public void loadFromXls(String xlsFilePath, String schema, boolean clear, String[] primaryKeys) {
 		try {
 
 			DatabaseConnection connection = null;
@@ -320,9 +322,14 @@ public class DatabaseService {
 			}
 			
 			DatabaseConfig config = connection.getConfig();
-			config.setProperty("http://www.dbunit.org/properties/escapePattern", "\"?\"");
-			config.setProperty("http://www.dbunit.org/features/batchedStatements", "true");
+			config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, "\"?\"");
+			config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
 
+			if (primaryKeys != null && primaryKeys.length != 0) {
+				PrimaryKeyFilter primaryKeyFilter = new PrimaryKeyFilter(primaryKeys);
+				config.setProperty(DatabaseConfig.PROPERTY_PRIMARY_KEY_FILTER, primaryKeyFilter);	
+			}
+			
 			File data = new File(xlsFilePath);
 			if (!data.exists() || ! data.canRead()) {
 				throw new FileLibraryException("Cannot read " + data.getAbsolutePath());

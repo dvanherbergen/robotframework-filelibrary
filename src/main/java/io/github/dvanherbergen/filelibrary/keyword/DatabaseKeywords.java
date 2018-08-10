@@ -38,28 +38,26 @@ public class DatabaseKeywords {
 		service.setQueryTimeOut(timeout);
 	}
 
-	@RobotKeyword("Replace all database table content with the content in the specified xls file. Uses DBUnit CLEAN_INSERT to perform the update.")
-	@ArgumentNames({"xlsFilename", "schema="})
-	public void replaceTables(String filename, String schema) {
-		service.loadFromXls(filename, schema, true);
+	@RobotKeyword("Replace all database table content with the content in the specified xls file. Uses DBUnit CLEAN_INSERT to perform the update.\n" 
+	+ "If the database does not have proper primary keys, you can specify custom primary keys per table in the format TABLE=KEY1,KEY2.\n"
+	+ "When using this option, no default primary keys will be used. You will have to specify the primary keys for all tables included in the file."
+	+ "Example usage:\n"
+	+ " | replaceTables | data.xlsx | MYSCHEMA | EMPLOYEE=FIRSTNAME,LASTNAME | EMPLOYER=NAME | \n"
+	)
+	@ArgumentNames({"xlsFilename", "schema", "*primaryKeys"})
+	public void replaceTables(String filename, String schema, String[] primaryKeys) {
+		service.loadFromXls(filename, schema, true, primaryKeys);
 	}
 	
-	@RobotKeywordOverload
-	public void replaceTables(String filename) {
-		replaceTables(filename, null); 
+	@RobotKeyword("Reload database tables content with the content in the specified xls file. Existing rows are updated. Missing rows are added. Uses DBUnit REFRESH to perform the update."
+			+ "If the database does not have proper primary keys, you can specify custom primary keys per table in the format TABLE=KEY1,KEY2.\n"
+			+ "When using this option, no default primary keys will be used. You will have to specify the primary keys for all tables included in the file."
+			+ "Example usage:\n"
+			+ " | replaceTables | data.xlsx | MYSCHEMA | EMPLOYEE=FIRSTNAME,LASTNAME | EMPLOYER=NAME | \n")
+	@ArgumentNames({"xlsFilename", "schema=", "*primaryKeys"})
+	public void refreshTables(String filename, String schema, String[] primaryKeys) {
+		service.loadFromXls(filename, schema, false, primaryKeys);
 	}
-	
-	@RobotKeyword("Reload database tables content with the content in the specified xls file. Existing rows are updated. Missing rows are added. Uses DBUnit REFRESH to perform the update.")
-	@ArgumentNames({"xlsFilename", "schema="})
-	public void refreshTables(String filename, String schema) {
-		service.loadFromXls(filename, schema, false);
-	}
-	
-	@RobotKeywordOverload
-	public void refreshTables(String filename) {
-		refreshTables(filename, null); 
-	}
-
 	
 	@RobotKeyword("Execute SQL INSERT or UPDATE statement(s). Specify either an SQL directly or the path to a .sql file. No results are returned from this keyword.")
 	@ArgumentNames({ "sql" })
