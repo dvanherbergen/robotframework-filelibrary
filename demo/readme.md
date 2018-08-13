@@ -30,13 +30,13 @@ docker start rf-demo-mysql
 ### Download JDBC driver
 
 ```
-wget http://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.12/mysql-connector-java-8.0.12.jar
+wget https://repo1.maven.org/maven2/org/hsqldb/hsqldb/2.3.6/hsqldb-2.3.6.jar
 ```
 
 ### Run demo
 
 ```
 mvn package
-robot -P target/robotframework-filelibrary-0.10.1.jar:mysql-connector-java-8.0.12.jar demo
+robot -P target/robotframework-filelibrary-0.10.2.jar:hsqldb-2.3.6.jar demo
 ```
 
