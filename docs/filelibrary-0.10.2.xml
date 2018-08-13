@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20180813 19:52:39" name="FileLibrary">
+<keywordspec format="ROBOT" type="library" generated="20180813 22:42:04" name="FileLibrary">
 <version>0.10.2</version>
-<scope>global</scope>
+<scope>test suite</scope>
 <namedargs>yes</namedargs>
 <doc>FileLibrary is a Robot Framework test library for generating test data files.
 
@@ -13,6 +13,23 @@ For SQL related commands, you can specify SQL satements either directly in the a
  | *IMPORTANT* | For statements included directly in the test case, you need to escape any template data variables. If you do not, it will not be able to find the value. | 
  | _Example_ | Execute SQL	update mytable set value = 2 where id = \${my_id} | 
 </doc>
+<init>
+<arguments>
+<arg>path=</arg>
+<arg>debug=False</arg>
+</arguments>
+<doc>FileLibrary is a Robot Framework test library for generating test data files.
+
+Built in variables: ${now}, ${today}
+
+For SQL related commands, you can specify SQL satements either directly in the argument or provide them in an .sql file. 
+
+
+ | *IMPORTANT* | For statements included directly in the test case, you need to escape any template data variables. If you do not, it will not be able to find the value. | 
+ | _Example_ | Execute SQL	update mytable set value = 2 where id = \${my_id} |</doc>
+<tags>
+</tags>
+</init>
 <kw name="Apply XSLT">
 <arguments>
 <arg>sourceFile</arg>
@@ -104,11 +121,27 @@ Example usage:
 <arg>templateFile</arg>
 <arg>outputFile</arg>
 </arguments>
-<doc>Generate a file based on a Freemarker template. Before using this keyword, you need to populate the Template Data using the 'Set Template Data...' keywords.
+<doc>Generate a file based on a Freemarker template. Before using this keyword, you need to populate the Template Data using the 
+Set Template Data...
+ keywords.
 All template data that is available can be referenced from within the Freemarker template using variables. E.g. ${soup.color}
 
 Usage:
 | Generate File | _templateFile_ | _outputFile_ |</doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get File Library Server Pid">
+<arguments>
+</arguments>
+<doc></doc>
+<tags>
+</tags>
+</kw>
+<kw name="Get Random UUID">
+<arguments>
+</arguments>
+<doc></doc>
 <tags>
 </tags>
 </kw>
@@ -272,7 +305,7 @@ The examples shown above could result in the following template data structure:
 <tags>
 </tags>
 </kw>
-<kw name="Stop File Library Process">
+<kw name="Stop">
 <arguments>
 </arguments>
 <doc>Stop remote library.</doc>

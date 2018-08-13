@@ -3,7 +3,7 @@ Library    FileLibrary
 Library     String
 
 Suite Setup   Initialize database
-Suite Teardown    Disconnect
+Suite Teardown    Stop
 
 *** Variables ***
 ${RESOURCE_DIR}       ${CURDIR}/resources

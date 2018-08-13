@@ -251,7 +251,9 @@ public class DatabaseService {
 						"Expected " + expectedResults.length + "values, but only received " + rs.getMetaData().getColumnCount());
 			}
 
-			rs.next();
+			if (!rs.next()) {
+				throw new FileLibraryException("0 rows found.");
+			};
 			for (i = 0; i < expectedResults.length; i++) {
 				String expected = expectedResults[i];
 				String actual = rs.getString(i + 1);
