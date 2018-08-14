@@ -70,6 +70,7 @@ public class DatabaseService {
 			if (con.isValid(1)) {
 				System.out.println("Connected to database " + url);
 			}
+			con.setAutoCommit(true);
 		} catch (Exception e) {
 			throw new FileLibraryException(e);
 		}
@@ -338,13 +339,12 @@ public class DatabaseService {
 			}
 			
 			IDataSet dataSet = new XlsDataSet(new FileInputStream(data));
-			con.setAutoCommit(true);
+			
 			if (clear) {
 				DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
 			} else {
 				DatabaseOperation.REFRESH.execute(connection, dataSet);
 			}
-			con.setAutoCommit(false);
 
 		} catch (DatabaseUnitException | SQLException | IOException e) {
 			StringBuilder builder = new StringBuilder("Error loading data from " + xlsFilePath + " : " + e.getClass().getSimpleName() + " : " + e.getMessage());
