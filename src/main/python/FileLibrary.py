@@ -6,6 +6,7 @@ import time
 import inspect
 import uuid
 import datetime
+import tempfile
 
 from robot.libraries.BuiltIn import BuiltIn
 from robot.utils.normalizing import NormalizedDict
@@ -33,29 +34,32 @@ class FileLibrary:
     jars = set(filter(lambda k: k.endswith('.jar'), sys.path))
     jars.add(self.driverPath)
     jars.add(FileLibrary.AGENT_PATH)
+    jars.add(os.environ.get('CLASSPATH',''))
     jars.add(os.environ.get('PYTHONPATH',''))
+    jars.add(os.environ.get('JYTHONPATH',''))
     jarSet = set(filter (None, jars ))
     classPath = os.pathsep.join(jars)
     mainClass = 'io.github.dvanherbergen.filelibrary.remote.RPCServer'
-    pidUUID = str(uuid.uuid4())
+    pidFilename = os.path.join(tempfile.gettempdir(), (str(uuid.uuid4()) + '.pid'))
+    logFile = os.path.join(tempfile.gettempdir(), 'filelibrary.log')
     if self.debug:
-      print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, pidUUID) 
-      self.process.start_process('java', debugArg, "-cp", classPath, mainClass, pidUUID, shell=True, cwd='', alias='rpcServer')
+      print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, pidFilename) 
+      self.process.start_process('java', debugArg, "-cp", classPath, mainClass, pidFilename, shell=True, cwd='', alias='rpcServer', stdout=logFile, stderr=None)
     else:
-      print("starting process ", 'java', "-cp", classPath, mainClass, pidUUID) 
-      self.process.start_process('java', "-cp", classPath, mainClass, pidUUID, shell=True, cwd='', alias='rpcServer')
+      print("starting process ", 'java', "-cp", classPath, mainClass, pidFilename) 
+      self.process.start_process('java', "-cp", classPath, mainClass, pidFilename, shell=True, cwd='', alias='rpcServer', stdout=logFile, stderr=None)
     i = 0
     # Wait till file is created max wait = 10 seconds
-    while not os.path.exists(pidUUID+'.pid') and i < 200:
+    while not os.path.exists(pidFilename) and i < 400:
       time.sleep(.05)
       i += 1
     # Wait some more to make sure the port is written to the file 
     time.sleep(.1)
-    pid_file = open(pidUUID+'.pid', "r")
+    pid_file = open(pidFilename, "r")
     port = pid_file.read()
     print("receiving port from file library port= " + port + " waited " + str(i*0.05)  +" s") 
     pid_file.close()
-    os.remove(pidUUID+'.pid')    
+    os.remove(pidFilename)    
     self.remoteLib = Remote('http://127.0.0.1:' + port)
 
 

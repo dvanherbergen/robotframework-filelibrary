@@ -5,14 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.BindException;
-import java.util.UUID;
 
 import org.robotframework.remoteserver.RemoteServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.dvanherbergen.filelibrary.FileLibrary;
 
 public class RPCServer extends RemoteServer {
 
+	private static final Logger logger = LoggerFactory.getLogger(RPCServer.class);
+	
 	private static RPCServer instance;
 
 	public static RPCServer getInstance() {
@@ -61,9 +64,11 @@ public class RPCServer extends RemoteServer {
 				writePortToPidFile(pidFile, localPort);
 			} catch (BindException e) {
 				System.out.println("Cannot bind to port.");
+				logger.error("Cannot bind to port.", e);
 				System.exit(1);
 			}
 		} catch (Throwable t) {
+			logger.error("Unexpected error", t);
 			t.printStackTrace();
 		}
 	}
@@ -75,18 +80,14 @@ public class RPCServer extends RemoteServer {
 	}
 
 	private static File createPidFile(String[] args) {
-		String uniqueId;
 		if (args.length != 1) {
-			uniqueId = UUID.randomUUID().toString();
-		} else {
-			uniqueId = args[0];
+			throw new IllegalArgumentException("No pid file argument specified.");
 		}
-		File pidFile = new File(uniqueId + ".pid");
-
+		File pidFile = new File(args[0]);
 		try {
 			pidFile.createNewFile();
 		} catch (IOException e1) {
-			System.out.println("pid file " + pidFile.getPath() + " already exists.");
+			System.out.println("pid file " + pidFile.getPath() + " already exists or is not writeable.");
 			System.exit(1);
 		}
 		return pidFile;
