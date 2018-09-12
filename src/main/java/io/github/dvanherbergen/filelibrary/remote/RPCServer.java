@@ -23,12 +23,13 @@ public class RPCServer extends RemoteServer {
 	}
 
 	public void run() throws Exception {
-
+        logger.info("Starting server...");
 		this.putLibrary("/RPC2", new FileLibrary());
 		this.setPort(0);
 		this.setAllowStop(true);
 		this.start();
 		Integer actualPort = this.getLocalPort();
+		logger.info("Started server on port " + actualPort + ".");
 		System.out.println("Started server on port " + actualPort + ".");
 
 	}
@@ -88,6 +89,7 @@ public class RPCServer extends RemoteServer {
 			pidFile.createNewFile();
 		} catch (IOException e1) {
 			System.out.println("pid file " + pidFile.getPath() + " already exists or is not writeable.");
+            logger.error("Error creating pid file", e1);
 			System.exit(1);
 		}
 		return pidFile;

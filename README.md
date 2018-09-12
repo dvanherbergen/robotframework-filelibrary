@@ -18,7 +18,6 @@ See [examples](demo/).
 ## TODO
 
 * support null parameter in where clause
-* load datafiles into DB using DBUnit
 * add demo
 * add docs
 * setup distribution to maven central
