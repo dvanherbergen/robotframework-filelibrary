@@ -18,17 +18,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.robotframework.remoteserver.cli.CommandLineHelper;
 import org.robotframework.remoteserver.library.RemoteLibrary;
-import org.robotframework.remoteserver.logging.Jetty2Log4J;
 import org.robotframework.remoteserver.servlet.IllegalPathException;
 import org.robotframework.remoteserver.servlet.RemoteServerServlet;
 
@@ -56,13 +51,14 @@ public class RemoteServer {
     private static Log log = LogFactory.getLog(RemoteServer.class);
     protected Server server;
     private RemoteServerServlet servlet;
-    private ServerConnector connector;
 
     public RemoteServer() {
-        server = new Server();
+    	this(0);
+    }
+    
+    public RemoteServer(int port) {
+        server = new Server(port);
         servlet = new RemoteServerServlet();
-        connector = new ServerConnector(server);
-        connector.setName("jrobotremoteserver");
         ServletContextHandler servletContextHandler = new ServletContextHandler(server, "/", false, false);
         servletContextHandler.addServlet(new ServletHolder(servlet), "/");
     }
@@ -74,19 +70,9 @@ public class RemoteServer {
      *         it has not been opened, or -2 if it has been closed.
      */
     public Integer getLocalPort() {
-        return connector.getLocalPort();
+    	return ((ServerConnector)server.getConnectors()[0]).getLocalPort();
     }
 
-    /**
-     * Sets the port to listen on.
-     *
-     * @param port
-     *            The port to listen on for connections or 0 if any available
-     *            port may be used. Defaults port is 0.
-     */
-    public void setPort(int port) {
-        connector.setPort(port);
-    }
 
     /**
      * Returns <code>true</code> if this server allows remote stopping.
@@ -108,41 +94,19 @@ public class RemoteServer {
     }
 
     /**
-     * Returns the hostname set with {@link #setHost(String)}.
-     *
-     * @return the hostname set with {@link #setHost(String)}
-     */
-    public String getHost() {
-        return connector.getHost();
-    }
-
-    /**
-     * Set the hostname of the interface to bind to. Usually not needed and
-     * determined automatically. For exotic network configuration, network with
-     * VPN, specifying the host might be necessary.
-     *
-     * @param hostName
-     *            the hostname or address representing the interface to which
-     *            all connectors will bind, or null for all interfaces.
-     */
-    public void setHost(String hostName) {
-        connector.setHost(hostName);
-    }
-
-    /**
      * Main method for command line usage.
      *
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        configureLogging();
+        //configureLogging();
         CommandLineHelper helper = new CommandLineHelper(args);
         if (helper.getHelpRequested()) {
             System.out.print(helper.getUsage());
             System.exit(0);
         }
-        RemoteServer remoteServer = new RemoteServer();
+        RemoteServer remoteServer = new RemoteServer(helper.getPort());
         String error = helper.getError();
         if (error == null) {
             try {
@@ -158,9 +122,7 @@ public class RemoteServer {
             System.out.println(helper.getUsage());
             System.exit(1);
         }
-        remoteServer.setPort(helper.getPort());
         remoteServer.setAllowStop(helper.getAllowStop());
-        remoteServer.setHost(helper.getHost());
         remoteServer.start();
     }
 
@@ -212,61 +174,8 @@ public class RemoteServer {
         return servlet.getLibraryMap();
     }
 
-    /**
-     * This has been deprecated. Please use {@link #putLibrary} and
-     * {@link #setPort} instead.
-     *
-     * Map the given test library to / and sets the port for the server. The
-     * server must be stopped when calling this.
-     *
-     * @param className
-     *            class name of the test library
-     * @param port
-     *            port for the server to listen on
-     */
-    @Deprecated
-    public void addLibrary(String className, int port) {
-        Class<?> clazz;
-        try {
-            clazz = Class.forName(className);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        addLibrary(clazz, port);
-    }
 
-    /**
-     * This has been deprecated. Please use {@link #putLibrary} and
-     * {@link #setPort} instead.
-     *
-     * Map the given test library to / and sets the port for the server. The
-     * server must be stopped when calling this.
-     *
-     * @param clazz
-     *            class of the test library
-     * @param port
-     *            port for the server to listen on
-     */
-    @Deprecated
-    public void addLibrary(Class<?> clazz, int port) {
-        if (!server.isStopped()) // old behavior
-            throw new IllegalStateException("Cannot add a library once the server is started");
-        if (connector.getPort() != 0 && connector.getPort() != port) {
-            throw new RuntimeException(
-                    "Serving on multiple ports is no longer supported. Please use putLibrary with different paths instead.");
-        }
-        if (servlet.getLibraryMap().keySet().contains("/")) {
-            throw new RuntimeException("A library has already been mapped to /.");
-        }
-        Object library;
-        try {
-            library = clazz.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        setPort(port);
-        putLibrary("/", library);
-    }
+
 
     /**
      * A non-blocking method for stopping the remote server that allows requests
@@ -315,33 +224,6 @@ public class RemoteServer {
         log.info("Robot Framework remote server starting");
         server.start();
         log.info(String.format("Robot Framework remote server started on port %d.", getLocalPort()));
-    }
-
-    /**
-     * Configures logging systems used by <tt>RemoteServer</tt> and its
-     * dependencies. Specifically,
-     * <ul>
-     * <li>Configure Log4J to log to the console</li>
-     * <li>Set Log4J's log level to INFO</li>
-     * <li>Redirect the Jetty's logging to Log4J</li>
-     * <li>Set Jakarta Commons Logging to log to Log4J</li>
-     * </ul>
-     * This is convenient if you do not want to configure the logging yourself.
-     * This will only affect future instances of
-     * {@link org.eclipse.jetty.util.log.Logger} and
-     * {@link org.apache.commons.logging.Log}, so this should be called as early
-     * as possible.
-     */
-    public static void configureLogging() {
-        Logger root = Logger.getRootLogger();
-        root.removeAllAppenders();
-        BasicConfigurator.configure();
-        root.setLevel(Level.INFO);
-        org.eclipse.jetty.util.log.Log.setLog(new Jetty2Log4J());
-        LogFactory.releaseAll();
-        LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log",
-                "org.apache.commons.logging.impl.Log4JLogger");
-        log = LogFactory.getLog(RemoteServer.class);
     }
 
 }

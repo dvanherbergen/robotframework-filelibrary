@@ -13,11 +13,12 @@ ${RESOURCE_DIR}       ${CURDIR}/resources
 *** Test Cases ***
 Load data from xls
     Comment    Insert data from XLS
-    db1.Refresh Tables    ${RESOURCE_DIR}/db_data.xlsx    MYSCHEMA
+    db2.Refresh Tables    ${RESOURCE_DIR}/db_data.xlsx    MYSCHEMA
+    ${owners}=    db2.Execute Query    select * from OWNERS
+    db1.Verify SQL Result    select count(*) from PETS where name = 'Twinkie'        0
     db1.Verify SQL Result    select email from OWNERS where name = 'jeff'    jeff@hotmail.com
-    db2.Verify SQL Result    select email from OWNERS where name = 'jeff'    jeff@hotmail.com
-    db1.Verify SQL Result    select count(*) from PETS where name = 'Twinkie'        1
-    db2.Verify SQL Result    select count(*) from PETS where name = 'Twinkie'    0
+    db2.Verify SQL Result    select email from OWNERS where name = 'Jules'    Jules@hotmail.com
+    db2.Verify SQL Result    select count(*) from PETS where name = 'Twinkie'    1
     
 *** Keywords ***
 Initialize database
