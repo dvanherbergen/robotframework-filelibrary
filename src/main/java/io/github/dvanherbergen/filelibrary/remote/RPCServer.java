@@ -1,16 +1,14 @@
 package io.github.dvanherbergen.filelibrary.remote;
 
+import io.github.dvanherbergen.filelibrary.FileLibrary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.BindException;
-
-import org.robotframework.remoteserver.RemoteServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.github.dvanherbergen.filelibrary.FileLibrary;
 
 public class RPCServer extends RemoteServer {
 

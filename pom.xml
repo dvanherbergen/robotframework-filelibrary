@@ -90,6 +90,12 @@
 										<exclude>about_files</exclude>
 									</excludes>
 								</filter>
+                                <filter>
+                                    <artifact>com.github.ombre42:jrobotremoteserver</artifact>
+                                    <excludes>
+                                        <exclude>org/robotframework/remoteserver/RemoteServer**</exclude>
+                                    </excludes>
+                                </filter>
 							</filters>
 						</configuration>
 					</execution>
