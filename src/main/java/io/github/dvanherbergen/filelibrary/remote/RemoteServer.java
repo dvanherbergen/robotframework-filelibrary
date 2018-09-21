@@ -186,7 +186,7 @@ public class RemoteServer {
      *            the milliseconds to wait for existing request to complete
      *            before stopping the server
      */
-    public void stop(int timeoutMS) throws Exception {
+    public void stop(final int timeoutMS) throws Exception {
         log.info("Robot Framework remote server stopping");
         if (timeoutMS > 0) {
             server.setStopTimeout(timeoutMS);
@@ -194,6 +194,7 @@ public class RemoteServer {
                 @Override
                 public void run() {
                     try {
+                        Thread.sleep(timeoutMS);
                         server.stop();
                     } catch (Throwable e) {
                         log.error(String.format("Failed to stop the server: %s", e.getMessage()), e);
@@ -212,7 +213,7 @@ public class RemoteServer {
      * @throws Exception
      */
     public void stop() throws Exception {
-        stop(0);
+        stop(1000);
     }
 
     /**

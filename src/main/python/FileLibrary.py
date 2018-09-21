@@ -41,7 +41,8 @@ class FileLibrary:
     classPath = os.pathsep.join(jars)
     mainClass = 'io.github.dvanherbergen.filelibrary.remote.RPCServer'
     pidFilename = os.path.join(tempfile.gettempdir(), (str(uuid.uuid4()) + '.pid'))
-    logFile = os.path.join(tempfile.gettempdir(), 'filelibrary.log')
+    logFile = os.path.join(tempfile.gettempdir(), 'filelibrary-' + (str(uuid.uuid4())) + '.log')
+    print("Logging to " + logFile)
     if self.debug:
       print("starting process ", 'java', debugArg, "-cp", classPath, mainClass, pidFilename) 
       self.process.start_process('java', debugArg, "-cp", classPath, mainClass, pidFilename, shell=True, cwd='', alias='rpcServer', stdout=logFile, stderr=None)
@@ -57,7 +58,7 @@ class FileLibrary:
     time.sleep(.1)
     pid_file = open(pidFilename, "r")
     port = pid_file.read()
-    print("receiving port from file library port= " + port + " waited " + str(i*0.05)  +" s") 
+    print("Received file library port: " + port + ", waited " + str(i*0.05)  +" s")
     pid_file.close()
     os.remove(pidFilename)    
     self.remoteLib = Remote('http://127.0.0.1:' + port)
@@ -125,7 +126,7 @@ class FileLibrary:
         # inject all variables from the test case context
         self.remoteLib.run_keyword(name, (self.get_robot_variables(),), kwargs) 
       else:
-        self.remoteLib.run_keyword(name, (), kwargs)      
+        self.remoteLib.run_keyword(name, (), kwargs)
     else:
       return self.remoteLib.run_keyword(name, arguments, kwargs)
 
