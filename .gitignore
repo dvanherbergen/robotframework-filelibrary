@@ -18,3 +18,7 @@ red.xml
 *.jar
 *.pid
 /filelibrary.iml
+.idea
+*.iml
+*.log
+.gradle

@@ -22,6 +22,7 @@ import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.excel.XlsDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 
 import io.github.dvanherbergen.filelibrary.FileLibraryException;
@@ -314,7 +315,7 @@ public class DatabaseService {
 	 * @param primaryKeys 
 	 * @param path
 	 */
-	public void loadFromXls(String xlsFilePath, String schema, boolean clear, String[] primaryKeys) {
+	public void loadFromFile(String filePath, String schema, boolean clear, String[] primaryKeys) {
 		try {
 
 			DatabaseConnection connection = null;
@@ -326,38 +327,37 @@ public class DatabaseService {
 			
 			DatabaseConfig config = connection.getConfig();
 			config.setProperty(DatabaseConfig.PROPERTY_ESCAPE_PATTERN, "\"?\"");
-			config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
-
+			if (StringUtils.isBlank(System.getenv("debug"))) {
+				config.setProperty(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, "true");
+			}
 			if (primaryKeys != null && primaryKeys.length != 0) {
 				PrimaryKeyFilter primaryKeyFilter = new PrimaryKeyFilter(primaryKeys);
 				config.setProperty(DatabaseConfig.PROPERTY_PRIMARY_KEY_FILTER, primaryKeyFilter);	
 			}
 			
-			File data = new File(xlsFilePath);
+			File data = new File(filePath);
 			if (!data.exists() || ! data.canRead()) {
 				throw new FileLibraryException("Cannot read " + data.getAbsolutePath());
 			}
 			
-			IDataSet dataSet = new XlsDataSet(new FileInputStream(data));
+			IDataSet dataSet = null;
+			if (filePath.endsWith("xml")) {
+				FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+				builder.setColumnSensing(true);
+				dataSet = builder.build(data);
+			} else {
+				dataSet = new XlsDataSet(new FileInputStream(data));
+			}
 			
 			if (clear) {
 				DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
 			} else {
 				DatabaseOperation.REFRESH.execute(connection, dataSet);
 			}
-
-		} catch (DatabaseUnitException | SQLException | IOException e) {
-			StringBuilder builder = new StringBuilder("Error loading data from " + xlsFilePath + " : " + e.getClass().getSimpleName() + " : " + e.getMessage());
-			Throwable t = e.getCause();
-			while(t != null) {
-				builder.append("\n Caused by: ")
-					.append(t.getClass().getSimpleName())
-					.append(": ")
-					.append(t.getMessage());
-				t = t.getCause();
-			}
-			throw new FileLibraryException(builder.toString(), e);
+		} catch (SQLException | DatabaseUnitException | IOException e) {
+			throw new FileLibraryException("Error loading data from " + filePath + " : " + e.getClass().getSimpleName(), e);
 		}
 	}
-	
+
+
 }

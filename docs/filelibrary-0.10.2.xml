@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keywordspec format="ROBOT" type="library" generated="20180814 12:00:45" name="FileLibrary">
+<keywordspec format="ROBOT" type="library" generated="20181022 12:00:23" name="FileLibrary">
 <version>0.10.2</version>
 <scope>test suite</scope>
 <namedargs>yes</namedargs>
@@ -183,7 +183,7 @@ Usage:
 <arg>schema=</arg>
 <arg>*primaryKeys</arg>
 </arguments>
-<doc>Reload database tables content with the content in the specified xls file. Existing rows are updated. Missing rows are added. Uses DBUnit REFRESH to perform the update.If the database does not have proper primary keys, you can specify custom primary keys per table in the format TABLE=KEY1,KEY2.
+<doc>Reload database tables content with the content in the specified xls/xml file. Existing rows are updated. Missing rows are added. Uses DBUnit REFRESH to perform the update.If the database does not have proper primary keys, you can specify custom primary keys per table in the format TABLE=KEY1,KEY2.
 When using this option, no default primary keys will be used. You will have to specify the primary keys for all tables included in the file.Example usage:
  | replaceTables | data.xlsx | MYSCHEMA | EMPLOYEE=FIRSTNAME,LASTNAME | EMPLOYER=NAME |</doc>
 <tags>
@@ -195,7 +195,7 @@ When using this option, no default primary keys will be used. You will have to s
 <arg>schema</arg>
 <arg>*primaryKeys</arg>
 </arguments>
-<doc>Replace all database table content with the content in the specified xls file. Uses DBUnit CLEAN_INSERT to perform the update.
+<doc>Replace all database table content with the content in the specified xls/xml file. Uses DBUnit CLEAN_INSERT to perform the update.
 If the database does not have proper primary keys, you can specify custom primary keys per table in the format TABLE=KEY1,KEY2.
 When using this option, no default primary keys will be used. You will have to specify the primary keys for all tables included in the file.Example usage:
  | replaceTables | data.xlsx | MYSCHEMA | EMPLOYEE=FIRSTNAME,LASTNAME | EMPLOYER=NAME |</doc>
